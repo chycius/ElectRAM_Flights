@@ -115,8 +115,108 @@ st.markdown("""
   .fdays-city { font-size:.72rem; color:var(--grey); }
   .day-cell-on { background:#63F542; height:26px; border-radius:2px; }
   .day-cell-off { background:#EF2B2B; height:26px; border-radius:2px; }
-  @media (max-width:900px) { .flight-card-body { flex-direction:column; align-items:stretch; } .flight-times { min-width:0; justify-content:center; } .price-panel { align-self:auto; } }
-</style>
+@media (max-width: 768px) {
+   .block-container {
+     padding-left: 0.75rem !important;
+     padding-right: 0.75rem !important;
+   }
+
+   .banner {
+     padding: 18px 14px 16px 14px;
+     margin: 0 -0.75rem 1rem -0.75rem;
+   } 
+
+   .banner h1 {
+     font-size: 1.9rem;
+   }
+
+   .banner p {
+     font-size: 0.75rem;
+   }
+
+   .search-card-marker + div {
+     padding: 18px 16px !important;
+   }
+
+   div[data-testid="column"] {
+     width: 100% !important;
+     flex: 1 1 100% !important;
+     min-width: 100% !important;
+   }
+
+   div[data-testid="stButton"] > button {
+     width: 100% !important;
+   }
+
+   .results-header {
+     flex-direction: column;
+     gap: 4px;
+   }
+
+   .results-title {
+     font-size: 1.15rem;
+   }
+
+   .flight-card-body {
+     flex-direction: column;
+     align-items: stretch;
+     min-height: auto;
+     padding: 18px 16px;
+     gap: 14px;
+   }
+
+   .flight-times {
+     min-width: 0;
+     justify-content: center;
+     gap: 6px;
+   }
+
+   .time-big {
+     font-size: 1.7rem;
+   }
+
+   .time-ampm {
+     font-size: 0.8rem;
+   }
+
+   .flight-arrow {
+     font-size: 0.85rem;
+     padding: 0 4px;
+   }
+
+   .flight-mid {
+     width: 100%;
+   }
+
+   .flight-codes {
+     font-size: 0.78rem;
+     gap: 6px;
+   }
+
+   .price-panel {
+     align-self: stretch;
+     margin-left: 0;
+     min-width: 0;
+   }
+
+   .price-big {
+     font-size: 1.6rem;
+   }
+
+   .time-advantage-box {
+     margin: 0 14px 14px 14px;
+     font-size: 0.78rem;
+   }
+
+   .rt-price-row {
+     padding: 14px 16px;
+   }
+ 
+   .rt-price-text {
+     font-size: 1.35rem;
+   }
+ }
+ </style>
 """, unsafe_allow_html=True)
 
 # ── Data ──────────────────────────────────────────────────────────────────────
