@@ -544,13 +544,30 @@ def render_flight_card(f, key, booking_mode, passengers, context="outbound"):
             passenger_line = f"Passengers: {passengers}"
             total = display_price * passengers
 
-        st.success(
-            f"**Flight Selected ✔**\n\n"
-            f"**{f['dep_code']} → {f['arr_code']}**  "
-            f"{dep_t}{dep_ap} – {arr_t}{arr_ap}  ·  {dur_str}  ·  {f['stops']}\n\n"
-            f"{price_label}: **${display_price}**  |  {passenger_line}  |  **Total: ${total}**\n\n"
-            f"*Proceeding to checkout…*"
-        )
+        st.success("Flight Selected ✔")
+
+        st.markdown(f"""
+        <div style="
+            background: var(--section-bg);
+            border: 1px solid var(--border);
+            padding: 14px 18px;
+            margin-top: 8px;
+            border-radius: 4px;
+        ">
+          <div style="font-size: 0.95rem; color: var(--dark);">
+            <b>{f['dep_code']} → {f['arr_code']}</b> &nbsp;&nbsp;
+            {dep_t}{dep_ap} – {arr_t}{arr_ap} &nbsp;·&nbsp; {dur_str} &nbsp;·&nbsp; {f['stops']}
+          </div>
+          <div style="margin-top: 6px; font-size: 0.9rem;">
+            <b>{price_label}:</b> ${display_price} &nbsp;&nbsp;|&nbsp;&nbsp;
+            {passenger_line} &nbsp;&nbsp;|&nbsp;&nbsp;
+            <b>Total:</b> ${total}
+          </div>
+          <div style="margin-top: 6px; font-size: 0.8rem; color: var(--grey);">
+            Proceeding to checkout…
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 def render_multileg_card(itin, key, booking_mode, passengers):
     leg1 = itin["leg1"]
@@ -629,16 +646,41 @@ def render_multileg_card(itin, key, booking_mode, passengers):
             passenger_line = f"Passengers: {passengers}"
             total = display_price * passengers
 
-        st.success(
-            f"**Connecting Flight Selected ✔**\n\n"
-            f"**LEG 1:** {leg1['dep_code']} → {leg1['arr_code']}  "
-            f"{l1_dep_t}{l1_dep_ap} – {l1_arr_t}{l1_arr_ap}\n\n"
-            f"**LAYOVER:** 45 min in {itin['connection']}\n\n"
-            f"**LEG 2:** {leg2['dep_code']} → {leg2['arr_code']}  "
-            f"{l2_dep_t}{l2_dep_ap} – {l2_arr_t}{l2_arr_ap}\n\n"
-            f"{price_label}: **${display_price}**  |  {passenger_line}  |  **Total: ${total}**\n\n"
-            f"*Proceeding to checkout…*"
-        )
+        st.success("Connecting Flight Selected ✔")
+
+        st.markdown(f"""
+        <div style="
+            background: var(--section-bg);
+            border: 1px solid var(--border);
+            padding: 14px 18px;
+            margin-top: 8px;
+            border-radius: 4px;
+        ">
+          <div style="font-size: 0.95rem; color: var(--dark);">
+            <b>LEG 1:</b> {leg1['dep_code']} → {leg1['arr_code']} &nbsp;
+            {l1_dep_t}{l1_dep_ap} – {l1_arr_t}{l1_arr_ap}
+          </div>
+
+          <div style="margin-top: 4px; font-size: 0.85rem; color: var(--grey);">
+            Layover: 45 min in {itin['connection']}
+          </div>
+
+          <div style="margin-top: 6px; font-size: 0.95rem; color: var(--dark);">
+            <b>LEG 2:</b> {leg2['dep_code']} → {leg2['arr_code']} &nbsp;
+            {l2_dep_t}{l2_dep_ap} – {l2_arr_t}{l2_arr_ap}
+          </div>
+
+          <div style="margin-top: 8px; font-size: 0.9rem;">
+            <b>{price_label}:</b> ${display_price} &nbsp;&nbsp;|&nbsp;&nbsp;
+            {passenger_line} &nbsp;&nbsp;|&nbsp;&nbsp;
+            <b>Total:</b> ${total}
+          </div>
+
+          <div style="margin-top: 6px; font-size: 0.8rem; color: var(--grey);">
+            Proceeding to checkout…
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 def render_round_trip_card(out_f, ret_f, key, booking_mode, passengers):
     out_price = out_f.get("display_price", out_f.get("price", 0))
@@ -745,11 +787,26 @@ def render_round_trip_card(out_f, ret_f, key, booking_mode, passengers):
             passenger_line = f"Passengers: {passengers}"
             final_total = total_price * passengers
 
-        st.success(
-            f"**Round Trip Selected ✔**\n\n"
-            f"{price_label}: **${total_price}**  |  {passenger_line}  |  **Total: ${final_total}**\n\n"
-            f"*Proceeding to checkout…*"
-        )
+        st.success("Round Trip Selected ✔")
+
+        st.markdown(f"""
+        <div style="
+            background:#F3F4F6;
+            border:1px solid #D1D5DB;
+            padding:14px 18px;
+            margin-top:8px;
+            border-radius:4px;
+        ">
+          <div style="font-size:0.95rem; color:#1A1A2E;">
+            <b>Price per person:</b> ${total_price} &nbsp;&nbsp;|&nbsp;&nbsp;
+            <b>Passengers:</b> {passengers} &nbsp;&nbsp;|&nbsp;&nbsp;
+            <b>Total:</b> ${final_total}
+          </div>
+          <div style="margin-top:6px; font-size:0.85rem; color:#75787b;">
+            Proceeding to checkout…
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 def render_flight_days_table():
     st.markdown("""
