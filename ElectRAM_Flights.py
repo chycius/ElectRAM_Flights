@@ -115,7 +115,7 @@ st.markdown("""
   .fdays-city { font-size:.72rem; color:var(--grey); }
   .day-cell-on { background:#63F542; height:26px; border-radius:2px; }
   .day-cell-off { background:#EF2B2B; height:26px; border-radius:2px; }
-@media (max-width: 768px) {
+  @media (max-width: 768px) {
    .block-container {
      padding-left: 0.75rem !important;
      padding-right: 0.75rem !important;
@@ -214,6 +214,48 @@ st.markdown("""
  
    .rt-price-text {
      font-size: 1.35rem;
+   }
+ }
+ @media (max-width: 768px) {
+   .search-card-marker + div {
+     padding: 16px 14px !important;
+     margin-bottom: 1.2rem !important;
+   }
+
+   div[data-testid="stRadio"] {
+     margin-bottom: 0.4rem !important;
+   }
+
+   div[data-testid="stRadio"] div[role="radiogroup"] {
+     gap: 14px !important;
+   }
+
+   div[data-testid="stRadio"] label p {
+     font-size: 0.95rem !important;
+   }
+
+   div[data-testid="stButton"] > button {
+     min-height: 42px !important;
+     font-size: 0.9rem !important;
+   }
+
+   div[data-testid="column"] {
+     margin-bottom: 0.35rem !important;
+   }
+
+   div[data-testid="stSelectbox"] [data-baseweb="select"],
+   div[data-testid="stDateInput"] input {
+     min-height: 44px !important;
+     font-size: 0.95rem !important;
+   }
+
+   .stCaption, [data-testid="stCaptionContainer"] {
+     font-size: 0.78rem !important;
+     margin-bottom: 2px !important;
+   }
+
+   button[kind="secondary"]:has(div p) {
+     min-height: 40px !important;
    }
  }
  </style>
@@ -970,19 +1012,15 @@ if "show_demo_notice" not in st.session_state:
     st.session_state.show_demo_notice = True
 
 if st.session_state.show_demo_notice:
-    notice_col, close_col = st.columns([8, 1])
+    st.warning(
+        "⚠️ **Demo Project Notice**\n\n"
+        "This is a student design/demo application. ElectRAM Air is not a real airline or booking service. "
+        "No flights are actually being booked or operated."
+    )
 
-    with notice_col:
-        st.warning(
-            "⚠️ **Demo Project Notice**\n\n"
-            "This is a student design/demo application. ElectRAM Air is not a real airline or booking service. "
-            "No flights are actually being booked or operated."
-        )
-
-    with close_col:
-        if st.button("✕", key="close_notice"):
-            st.session_state.show_demo_notice = False
-            st.rerun()
+    if st.button("Close notice", key="close_notice"):
+        st.session_state.show_demo_notice = False
+        st.rerun()
 
 # ── Search Card ───────────────────────────────────────────────────────────────
 
