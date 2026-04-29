@@ -156,7 +156,7 @@ st.markdown("""
 
     div[data-testid="stRadio"] > div {
       flex-direction: row !important;
-      gap: 4px !important;
+      gap: 6px !important;
       flex-wrap: nowrap !important;
     }
 
