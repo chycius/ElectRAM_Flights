@@ -53,7 +53,7 @@ st.markdown("""
   div[data-testid="stAlert"] { color:var(--dark) !important; }
   div[data-testid="stAlert"] * { color:var(--dark) !important; }
   /* Make +/- buttons same height as number */
-  div[data-testid="stButton"] > button { height: 42px !important; }
+  div[data-testid="stButton"] > button { height: 34px !important; }
 
   /* Collapse Streamlit's markdown wrapper bottom padding so passenger number sits flush with buttons */
   .pax-num-wrap [data-testid="stMarkdownContainer"] { margin: 0 !important; padding: 0 !important; line-height: 1 !important; }
