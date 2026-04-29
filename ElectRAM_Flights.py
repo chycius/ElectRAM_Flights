@@ -104,65 +104,8 @@ st.markdown("""
   .fdays-city { font-size:.65rem; color:var(--grey); }
   .day-cell-on { background:#63F542; height:20px; border-radius:2px; }
   .day-cell-off { background:#EF2B2B; height:20px; border-radius:2px; }
-    /* ── Force compact mobile layout instead of Streamlit stacking ── */
-  @media (max-width: 640px) {
+    @media (max-width: 640px) {
     .block-container {
-      max-width: 480px !important;
-      padding-left: 13px !important;
-      padding-right: 13px !important;
-    }
-
-    div[data-testid="stHorizontalBlock"] {
-      display: flex !important;
-      flex-direction: row !important;
-      flex-wrap: nowrap !important;
-      gap: 8px !important;
-      align-items: end !important;
-    }
-
-    div[data-testid="stHorizontalBlock"] > div {
-      width: auto !important;
-      flex: 1 1 0 !important;
-      min-width: 0 !important;
-    }
-
-    div[data-testid="stHorizontalBlock"] > div:has(#swap_btn) {
-      flex: 0 0 42px !important;
-      max-width: 42px !important;
-    }
-
-    div[data-testid="stHorizontalBlock"] > div:has(#pax_minus),
-    div[data-testid="stHorizontalBlock"] > div:has(#pax_plus) {
-      flex: 0 0 64px !important;
-      max-width: 64px !important;
-    }
-
-    div[data-testid="stButton"] > button {
-      min-height: 42px !important;
-      padding: 0 8px !important;
-      font-size: 0.9rem !important;
-    }
-
-    div[data-testid="stRadio"] {
-      margin-bottom: 0 !important;
-    }
-
-    div[data-testid="stRadio"] > div {
-      flex-direction: row !important;
-      gap: 12px !important;
-      flex-wrap: nowrap !important;
-    }
-
-    div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
-    div[data-testid="stDateInput"] input {
-      min-height: 42px !important;
-      font-size: 0.8rem !important;
-    }
-  }
-    /* ── Force compact mobile layout instead of Streamlit stacking ── */
-  @media (max-width: 640px) {
-    .block-container {
-      max-width: 480px !important;
       padding-left: 13px !important;
       padding-right: 13px !important;
     }
@@ -176,76 +119,52 @@ st.markdown("""
     }
 
     div[data-testid="stHorizontalBlock"] > div {
-      width: auto !important;
-      flex: 1 1 0 !important;
       min-width: 0 !important;
     }
 
-    /* Passenger minus / plus buttons */
-    div[data-testid="stHorizontalBlock"] > div:has(#pax_minus),
-    div[data-testid="stHorizontalBlock"] > div:has(#pax_plus) {
-      flex: 0 0 52px !important;
-      max-width: 52px !important;
-    }
-
-    /* Airport swap button */
-    div[data-testid="stHorizontalBlock"] > div:has(#swap_btn) {
+    /* Any 3-column row: airport row + passenger buttons */
+    div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(2) {
       flex: 0 0 44px !important;
       max-width: 44px !important;
     }
 
-    /* Flight Days button side */
-    div[data-testid="stHorizontalBlock"] > div:has(button[kind="secondary"]) {
-      min-width: 0 !important;
+    /* Nested passenger - / number / + row */
+    div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(1),
+    div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(3) {
+      flex: 0 0 48px !important;
+      max-width: 48px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(2) {
+      flex: 0 0 28px !important;
+      max-width: 28px !important;
     }
 
     div[data-testid="stButton"] > button {
-      min-height: 40px !important;
-      height: 40px !important;
-      padding: 0 10px !important;
-      font-size: 0.86rem !important;
+      min-height: 38px !important;
+      height: 38px !important;
+      padding: 0 8px !important;
+      font-size: 0.82rem !important;
       white-space: nowrap !important;
-    }
-
-    #pax_minus button,
-    #pax_plus button,
-    #swap_btn button {
-      padding: 0 !important;
-      font-size: 1rem !important;
-    }
-
-    div[data-testid="stRadio"] {
-      margin-bottom: 0 !important;
     }
 
     div[data-testid="stRadio"] > div {
       flex-direction: row !important;
-      gap: 14px !important;
+      gap: 10px !important;
       flex-wrap: nowrap !important;
     }
 
     div[data-testid="stRadio"] label p {
-      font-size: 0.82rem !important;
-      line-height: 1.15 !important;
-      white-space: normal !important;
+      font-size: 0.78rem !important;
+      line-height: 1.1 !important;
     }
 
     div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
     div[data-testid="stDateInput"] input {
-      min-height: 40px !important;
-      font-size: 0.78rem !important;
+      min-height: 38px !important;
+      font-size: 0.76rem !important;
     }
-
-    .banner h1 {
-      font-size: 1.45rem !important;
-      white-space: nowrap !important;
-    }
-
-    .banner p {
-      font-size: 0.72rem !important;
-      white-space: nowrap !important;
-    }
-  }
+  }  
 </style>
 """, unsafe_allow_html=True)
 
@@ -1085,7 +1004,7 @@ with st.container():
     def code_to_index(code):
         return airport_codes_list.index(code) if code in airport_codes_list else 0
 
-    r2_cols = st.columns([2.4, 0.4, 2.4])
+    r2_cols = st.columns([2.7, 0.45, 2.7])
 
     with r2_cols[0]:
         st.caption("Departing")
