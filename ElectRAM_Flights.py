@@ -978,7 +978,7 @@ with st.container():
                 st.session_state.passengers = min(9, st.session_state.passengers + 1)
 
     # Row 1b: Booking type + Flight Days button
-    r1b_cols = st.columns([1.05, 1.35])
+    r1b_cols = st.columns([1.55, 1.25])
 
     with r1b_cols[0]:
         st.caption("Booking Type")
