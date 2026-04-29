@@ -131,8 +131,8 @@ st.markdown("""
     /* Nested passenger - / number / + row */
     div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(1),
     div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(3) {
-      flex: 0 0 48px !important;
-      max-width: 48px !important;
+      flex: 0 0 42px !important;
+      max-width: 42px !important;
     }
 
     div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(2) {
@@ -964,13 +964,13 @@ with st.container():
 
     with r1a_cols[1]:
         st.caption("👤 Passengers")
-        p_col1, p_col2, p_col3 = st.columns([1, 0.7, 1])
+        p_col1, p_col2, p_col3 = st.columns([0.85, 0.5, 0.85])
         with p_col1:
             if st.button("−", key="pax_minus", use_container_width=True):
                 st.session_state.passengers = max(1, st.session_state.passengers - 1)
         with p_col2:
             st.markdown(
-                f"<div style='text-align:center;font-size:1.1rem;font-weight:bold;padding-top:10px'>{st.session_state.passengers}</div>",
+                f"<div style='text-align:center;font-size:1.1rem;font-weight:bold;padding-top:6px'>{st.session_state.passengers}</div>",
                 unsafe_allow_html=True
             )
         with p_col3:
