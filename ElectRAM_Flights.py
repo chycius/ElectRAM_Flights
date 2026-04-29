@@ -183,7 +183,7 @@ st.markdown("""
     
     /* Pull passenger number upward between - and + */
     .pax-number {
-      transform: translateY(-18px) !important;
+      transform: translateY(-28px) !important;
       height: 38px !important;
       display: flex !important;
       align-items: center !important;
