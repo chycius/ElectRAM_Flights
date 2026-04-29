@@ -996,7 +996,7 @@ with st.container():
             ["Round Trip", "One Way"],
             index=0 if st.session_state.trip_type == "Round Trip" else 1,
             horizontal=True,
-            label_visibility="hidden",
+            label_visibility="collapsed",
         )
         st.session_state.trip_type = trip_type
 
@@ -1036,7 +1036,7 @@ with st.container():
             ["Seat Booking", "Charter Aircraft"],
             index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
             horizontal=True,
-            label_visibility="hidden",
+            label_visibility="collapsed",
         )
         st.session_state.booking_mode = booking_mode
 
