@@ -8,7 +8,7 @@ import copy
 # streamlit run ElectRAM_Flights_Web.py
 
 # This is the version of the code prior to most of the UI rendering logic being 
-# converted for phone use
+# converted for phone use 
 
 # ── Page Config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -16,6 +16,8 @@ st.set_page_config(
     page_icon="✈",
     layout="centered",
 )
+
+# GIT push test
 
 # ── Custom CSS ────────────────────────────────────────────────────────────────
 st.markdown("""
