@@ -159,6 +159,93 @@ st.markdown("""
       font-size: 0.8rem !important;
     }
   }
+    /* ── Force compact mobile layout instead of Streamlit stacking ── */
+  @media (max-width: 640px) {
+    .block-container {
+      max-width: 480px !important;
+      padding-left: 13px !important;
+      padding-right: 13px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 10px !important;
+      align-items: end !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] > div {
+      width: auto !important;
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+    }
+
+    /* Passenger minus / plus buttons */
+    div[data-testid="stHorizontalBlock"] > div:has(#pax_minus),
+    div[data-testid="stHorizontalBlock"] > div:has(#pax_plus) {
+      flex: 0 0 52px !important;
+      max-width: 52px !important;
+    }
+
+    /* Airport swap button */
+    div[data-testid="stHorizontalBlock"] > div:has(#swap_btn) {
+      flex: 0 0 44px !important;
+      max-width: 44px !important;
+    }
+
+    /* Flight Days button side */
+    div[data-testid="stHorizontalBlock"] > div:has(button[kind="secondary"]) {
+      min-width: 0 !important;
+    }
+
+    div[data-testid="stButton"] > button {
+      min-height: 40px !important;
+      height: 40px !important;
+      padding: 0 10px !important;
+      font-size: 0.86rem !important;
+      white-space: nowrap !important;
+    }
+
+    #pax_minus button,
+    #pax_plus button,
+    #swap_btn button {
+      padding: 0 !important;
+      font-size: 1rem !important;
+    }
+
+    div[data-testid="stRadio"] {
+      margin-bottom: 0 !important;
+    }
+
+    div[data-testid="stRadio"] > div {
+      flex-direction: row !important;
+      gap: 14px !important;
+      flex-wrap: nowrap !important;
+    }
+
+    div[data-testid="stRadio"] label p {
+      font-size: 0.82rem !important;
+      line-height: 1.15 !important;
+      white-space: normal !important;
+    }
+
+    div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+    div[data-testid="stDateInput"] input {
+      min-height: 40px !important;
+      font-size: 0.78rem !important;
+    }
+
+    .banner h1 {
+      font-size: 1.45rem !important;
+      white-space: nowrap !important;
+    }
+
+    .banner p {
+      font-size: 0.72rem !important;
+      white-space: nowrap !important;
+    }
+  }
 </style>
 """, unsafe_allow_html=True)
 
@@ -943,7 +1030,7 @@ with st.container():
     st.markdown('<div class="search-card-marker"></div>', unsafe_allow_html=True)
 
     # Row 1a: Trip type + Passengers side by side
-    r1a_cols = st.columns([1.25, 1.0])
+    r1a_cols = st.columns([1.15, 1.25])
 
     with r1a_cols[0]:
         st.caption("Trip Type")
@@ -972,7 +1059,7 @@ with st.container():
                 st.session_state.passengers = min(9, st.session_state.passengers + 1)
 
     # Row 1b: Booking type + Flight Days button
-    r1b_cols = st.columns([1.25, 1.0])
+    r1b_cols = st.columns([1.05, 1.35])
 
     with r1b_cols[0]:
         st.caption("Booking Type")
