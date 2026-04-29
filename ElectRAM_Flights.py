@@ -590,7 +590,7 @@ def render_flight_card(f, key, booking_mode, passengers, context="outbound"):
       <div class="flight-card-body">
         <div class="flight-times">
           <span class="time-big">{dep_t}</span><span class="time-ampm">{dep_ap}</span>
-          <span class="flight-arrow">&nbsp;──✈──&nbsp;</span>
+          <span class="flight-arrow">&nbsp;─✈─&nbsp;</span>
           <span class="time-big">{arr_t}</span><span class="time-ampm">{arr_ap}</span>
         </div>
         <div class="flight-mid">
@@ -688,7 +688,7 @@ def render_multileg_card(itin, key, booking_mode, passengers):
       <div class="flight-card-body">
         <div class="flight-times">
           <span class="time-big">{dep_t}</span><span class="time-ampm">{dep_ap}</span>
-          <span class="flight-arrow">&nbsp;──✈──&nbsp;</span>
+          <span class="flight-arrow">&nbsp;─✈─&nbsp;</span>
           <span class="time-big">{arr_t}</span><span class="time-ampm">{arr_ap}</span>
         </div>
         <div class="flight-mid">
@@ -800,7 +800,7 @@ def render_round_trip_card(out_f, ret_f, key, booking_mode, passengers):
         <div class="flight-card-body">
           <div class="flight-times">
             <span class="time-big">{dep_t}</span><span class="time-ampm">{dep_ap}</span>
-            <span class="flight-arrow">&nbsp;──✈──&nbsp;</span>
+            <span class="flight-arrow">&nbsp;─✈─&nbsp;</span>
             <span class="time-big">{arr_t}</span><span class="time-ampm">{arr_ap}</span>
           </div>
           <div class="flight-mid">
