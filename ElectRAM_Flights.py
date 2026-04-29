@@ -5,13 +5,16 @@ import copy
 
 # Copy and paste the following line into your terminal to run the app:
 # Save to update new code thats been added/changed
-# streamlit run ElectRAM_Flights.py
+# streamlit run ElectRAM_Flights_Web.py
+
+# This is the version of the code prior to most of the UI rendering logic being 
+# converted for phone use
 
 # ── Page Config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="ElectRAM – Flight Search",
     page_icon="✈",
-    layout="wide",
+    layout="centered",
 )
 
 # ── Custom CSS ────────────────────────────────────────────────────────────────
@@ -20,363 +23,88 @@ st.markdown("""
   :root { --bg:#F7F8FA; --white:#FFFFFF; --dark:#1A1A2E; --grey:#75787b; --light-grey:#E5E7EB; --border:#D1D5DB; --section-bg:#F3F4F6; --gold:#B8860B; --maroon:#861F41; --orange:#E5751F; --red-light:#FFF1F3; }
   html, body, .stApp, [data-testid="stAppViewContainer"] { background: var(--bg) !important; color: var(--dark) !important; font-family: "Segoe UI", Arial, sans-serif !important; }
   [data-testid="stHeader"] { background: transparent !important; }
-  .block-container { max-width: 1280px !important; padding-top:0 !important; padding-left:1.8rem !important; padding-right:1.8rem !important; }
+  .block-container { max-width: 480px !important; padding-top:0 !important; padding-left:.75rem !important; padding-right:.75rem !important; }
   #MainMenu, footer, header { visibility:hidden; }
-  .banner { background:var(--maroon); color:white; padding:28px 30px 22px 30px; margin:0 -1.8rem 1.4rem -1.8rem; text-align:center; border-bottom:1px solid #74203A; }
-  .banner h1 { font-family:Georgia,serif; font-size:2.55rem; font-weight:700; margin:0; line-height:1.1; letter-spacing:.2px; }
-  .banner p { font-size:.86rem; color:#AAB0B8; margin:8px 0 0 0; }
-  .search-card-marker {
-   display: none;
-  }
-  .search-card-marker + div {
-   background: white;
-   border: 1px solid var(--border);
-   padding: 26px 30px;
-   margin: 0 0 1.8rem 0;
-   border-radius: 2px !important;
-   box-shadow: none;
-  }
-  label, .stCaption, [data-testid="stCaptionContainer"] { color:var(--grey) !important; font-size:.82rem !important; }
-  div[data-testid="stRadio"] label p { color:var(--dark) !important; font-size:.98rem !important; }
-  div[data-testid="stSelectbox"] div,
-  div[data-testid="stDateInput"] div {
-   color: var(--dark) !important;
-  }
-  div[data-testid="stSelectbox"] > div,
-  div[data-testid="stDateInput"] > div {
-   background: white !important;
-   border: 1px solid var(--border) !important;
-   border-radius: 2px !important;
-  }
-  div[data-testid="stDateInput"] input {
-   background: white !important;
-   color: var(--dark) !important;
-  }  
-  div[data-testid="stButton"] > button { background:var(--orange) !important; color:white !important; border:none !important; border-radius:2px !important; font-weight:700 !important; min-height:44px; box-shadow:none !important; }
+
+  /* ── Banner ── */
+  .banner { background:var(--maroon); color:white; padding:16px 16px 12px 16px; margin:0 -.75rem 1rem -.75rem; text-align:center; border-bottom:1px solid #74203A; }
+  .banner h1 { font-family:Georgia,serif; font-size:1.65rem; font-weight:700; margin:0; line-height:1.1; letter-spacing:.2px; }
+  .banner p { font-size:.76rem; color:#AAB0B8; margin:5px 0 0 0; }
+
+  /* ── Search card ── */
+  .search-card-marker { display:none; }
+  .search-card-marker + div { background:white; border:1px solid var(--border); padding:14px 14px; margin:0 0 1rem 0; border-radius:4px !important; box-shadow:none; }
+
+  /* ── Inputs ── */
+  label, .stCaption, [data-testid="stCaptionContainer"] { color:var(--grey) !important; font-size:.76rem !important; }
+  div[data-testid="stRadio"] label p { color:var(--dark) !important; font-size:.88rem !important; }
+  div[data-testid="stSelectbox"] div, div[data-testid="stDateInput"] div { color:var(--dark) !important; }
+  div[data-testid="stSelectbox"] > div, div[data-testid="stDateInput"] > div { background:white !important; border:1px solid var(--border) !important; border-radius:2px !important; }
+  div[data-testid="stDateInput"] input { background:white !important; color:var(--dark) !important; font-size:.85rem !important; }
+  div[data-testid="stSelectbox"] [data-baseweb="select"] { background:white !important; }
+  div[data-testid="stSelectbox"] [data-baseweb="select"] > div { background:white !important; color:var(--dark) !important; font-size:.85rem !important; }
+  div[data-testid="stSelectbox"] [data-baseweb="select"] * { background-color:white !important; color:var(--dark) !important; }
+  div[data-testid="stSelectbox"] [data-baseweb="select"] svg { fill:var(--dark) !important; }
+
+  /* ── Buttons ── */
+  div[data-testid="stButton"] > button { background:var(--orange) !important; color:white !important; border:none !important; border-radius:2px !important; font-weight:700 !important; min-height:42px; font-size:.88rem !important; box-shadow:none !important; }
   div[data-testid="stButton"] > button:hover { background:var(--maroon) !important; color:white !important; }
-  div[data-testid="stButton"] > button { display: flex !important; align-items: center !important; justify-content: center !important; }
-  div[data-testid="stSelectbox"] [data-baseweb="select"] {
-    background: white !important;
-  }
-  div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    background: white !important;
-    color: var(--dark) !important;
-  }
-  div[data-testid="stSelectbox"] [data-baseweb="select"] * {
-    background-color: white !important;
-    color: var(--dark) !important;
-  }
-  div[data-testid="stSelectbox"] [data-baseweb="select"] svg {
-    fill: var(--dark) !important;
-  }
-  div[data-testid="stAlert"] { color: var(--dark) !important; }
-  div[data-testid="stAlert"] * { color: var(--dark) !important; }
-  .results-header { display:flex; align-items:baseline; gap:12px; margin:6px 0 10px 0; }
-  .results-title { font-size:1.35rem; font-weight:800; color:var(--dark); }
-  .results-sub { font-size:.85rem; color:var(--grey); }
-  .section-header { background:var(--section-bg); border:1px solid var(--border); color:var(--grey); font-size:.76rem; font-weight:800; padding:10px 16px; letter-spacing:.4px; margin-bottom:0; text-transform:uppercase; }
-  .flight-card { background:var(--white); border:1px solid var(--border); margin:0 0 18px 0; overflow:hidden; }
-  .flight-card-popular-banner { background:var(--section-bg); color:var(--gold); font-weight:800; font-size:.76rem; text-align:right; padding:6px 14px; border-bottom:1px solid var(--border); }
-  .flight-card-body { display:flex; align-items:center; min-height:120px; padding:16px 22px; gap:22px; }
-  .flight-times { display:flex; align-items:baseline; gap:8px; min-width:310px; white-space:nowrap; }
-  .time-big { font-family:Georgia,serif; font-size:2.05rem; font-weight:800; color:var(--dark); line-height:1; }
-  .time-ampm { font-family:Georgia,serif; font-size:.95rem; font-weight:800; color:var(--grey); }
-  .flight-arrow { color:var(--grey); font-size:1rem; padding:0 8px; }
-  .flight-mid { flex: 1; display:flex; flex-direction:column; align-items:stretch; gap:4px; }
-  .flight-dur { text-align:center; font-weight:800; font-size:.98rem; margin-bottom:6px; }
+  div[data-testid="stButton"] > button { display:flex !important; align-items:center !important; justify-content:center !important; }
+  div[data-testid="stAlert"] { color:var(--dark) !important; }
+  div[data-testid="stAlert"] * { color:var(--dark) !important; }
+
+  /* ── Results header ── */
+  .results-header { display:flex; flex-direction:column; gap:4px; margin:4px 0 8px 0; }
+  .results-title { font-size:1.1rem; font-weight:800; color:var(--dark); }
+  .results-sub { font-size:.76rem; color:var(--grey); }
+  .section-header { background:var(--section-bg); border:1px solid var(--border); color:var(--grey); font-size:.7rem; font-weight:800; padding:7px 12px; letter-spacing:.4px; margin-bottom:0; text-transform:uppercase; white-space:normal; word-break:break-word; }
+
+  /* ── Flight card – stacked mobile layout ── */
+  .flight-card { background:var(--white); border:1px solid var(--border); margin:0 0 12px 0; overflow:hidden; }
+  .flight-card-popular-banner { background:var(--section-bg); color:var(--gold); font-weight:800; font-size:.7rem; text-align:right; padding:5px 12px; border-bottom:1px solid var(--border); }
+  .flight-card-body { display:flex; flex-direction:column; padding:12px 14px 10px 14px; gap:10px; }
+
+  /* Times row */
+  .flight-times { display:flex; align-items:baseline; gap:6px; justify-content:center; white-space:nowrap; }
+  .time-big { font-family:Georgia,serif; font-size:1.7rem; font-weight:800; color:var(--dark); line-height:1; }
+  .time-ampm { font-family:Georgia,serif; font-size:.82rem; font-weight:800; color:var(--grey); }
+  .flight-arrow { color:var(--grey); font-size:.9rem; padding:0 6px; }
+
+  /* Mid: duration + codes */
+  .flight-mid { display:flex; flex-direction:column; align-items:stretch; gap:3px; }
+  .flight-dur { text-align:center; font-weight:800; font-size:.88rem; margin-bottom:4px; }
   .dur-nonstop { color:var(--grey); } .dur-stop { color:var(--orange); }
-  .flight-divider { height:2px; background:var(--grey); margin:6px 0 8px 0; }
-  .flight-codes { display:flex; justify-content:center; align-items:center; gap:9px; color:var(--grey); font-size:.86rem; flex-wrap:wrap; }
+  .flight-divider { height:2px; background:var(--grey); margin:4px 0 6px 0; }
+  .flight-codes { display:flex; justify-content:center; align-items:center; gap:6px; color:var(--grey); font-size:.78rem; flex-wrap:wrap; }
   .flight-code-bold { font-weight:900; color:var(--dark); }
-  .price-panel { background:var(--section-bg); border:1px solid var(--border); min-width:142px; padding:17px 18px 13px 18px; text-align:center; align-self:stretch; display:flex; flex-direction:column; justify-content:center; margin-left:auto; }
-  .price-big { font-family:Georgia,serif; color:var(--dark); font-size:1.85rem; font-weight:800; line-height:1.1; }
-  .seats-left { color:var(--orange); font-size:.82rem; margin-top:7px; }
-  .connection-note { color:var(--grey); font-size:.82rem; padding:0 24px 9px 24px; }
-  .time-advantage-box { background:var(--red-light); border:1px solid var(--border); margin:0 22px 14px 22px; padding:10px 16px; font-size:.84rem; }
-  .ta-label { color:var(--maroon); font-weight:800; font-size:.76rem; margin-bottom:3px; }
+
+  /* Price panel – full-width strip at bottom of card on mobile */
+  .price-panel { background:var(--section-bg); border:1px solid var(--border); border-left:none; border-right:none; border-bottom:none; padding:10px 14px 8px 14px; text-align:center; display:flex; flex-direction:row; justify-content:center; align-items:center; gap:14px; margin-top:4px; }
+  .price-big { font-family:Georgia,serif; color:var(--dark); font-size:1.55rem; font-weight:800; line-height:1.1; }
+  .seats-left { color:var(--orange); font-size:.76rem; }
+  .connection-note { color:var(--grey); font-size:.76rem; padding:0 14px 8px 14px; }
+  .time-advantage-box { background:var(--red-light); border:1px solid var(--border); margin:0 12px 10px 12px; padding:8px 12px; font-size:.78rem; }
+  .ta-label { color:var(--maroon); font-weight:800; font-size:.7rem; margin-bottom:2px; }
   .ta-detail { color:var(--dark); }
-  .rt-section-label { background:var(--section-bg); color:var(--grey); font-size:.76rem; font-weight:800; padding:8px 18px; border-bottom:1px solid var(--border); text-transform:uppercase; }
+
+  /* Round trip card */
+  .rt-section-label { background:var(--section-bg); color:var(--grey); font-size:.7rem; font-weight:800; padding:6px 14px; border-bottom:1px solid var(--border); text-transform:uppercase; }
   .rt-divider { height:1px; background:var(--dark); margin:0; }
-  .rt-price-row {
-    background: var(--section-bg);
-    border-top: 1px solid var(--border);
-    padding: 14px 24px 22px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .rt-price-text { font-family:Georgia,serif; font-size:1.7rem; font-weight:800; color:var(--dark); }
-  .savings-note { color:var(--grey); font-weight:800; font-size:.82rem; }
-  .fdays-table { width:100%; border-collapse:collapse; background:white; }
-  .fdays-table th { font-size:.8rem; color:var(--dark); padding:7px 8px; text-align:center; }
+  .rt-price-row { background:var(--section-bg); border-top:1px solid var(--border); padding:10px 14px 14px 14px; display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
+  .rt-price-text { font-family:Georgia,serif; font-size:1.35rem; font-weight:800; color:var(--dark); }
+  .savings-note { color:var(--grey); font-weight:800; font-size:.76rem; }
+
+  /* Flight days table – horizontal scroll */
+  .fdays-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .fdays-table { width:100%; border-collapse:collapse; background:white; min-width:340px; }
+  .fdays-table th { font-size:.72rem; color:var(--dark); padding:5px 5px; text-align:center; }
   .fdays-table th:first-child { text-align:left; }
-  .fdays-table td { padding:3px 2px; }
-  .fdays-route { font-size:.82rem; font-weight:800; color:var(--dark); }
-  .fdays-city { font-size:.72rem; color:var(--grey); }
-  .day-cell-on { background:#63F542; height:26px; border-radius:2px; }
-  .day-cell-off { background:#EF2B2B; height:26px; border-radius:2px; }
-  @media (max-width: 768px) {
-   .block-container {
-     padding-left: 0.75rem !important;
-     padding-right: 0.75rem !important;
-   }
-
-   .banner {
-     padding: 18px 14px 16px 14px;
-     margin: 0 -0.75rem 1rem -0.75rem;
-   } 
-
-   .banner h1 {
-     font-size: 1.9rem;
-   }
-
-   .banner p {
-     font-size: 0.75rem;
-   }
-
-   .search-card-marker + div {
-     padding: 18px 16px !important;
-   }
-
-   div[data-testid="stButton"] > button {
-     width: 100% !important;
-   }
-
-   .results-header {
-     flex-direction: column;
-     gap: 4px;
-   }
-
-   .results-title {
-     font-size: 1.15rem;
-   }
-
-   .flight-card-body {
-     flex-direction: column;
-     align-items: stretch;
-     min-height: auto;
-     padding: 18px 16px;
-     gap: 14px;
-   }
-
-   .flight-times {
-     min-width: 0;
-     justify-content: center;
-     gap: 6px;
-   }
-
-   .time-big {
-     font-size: 1.7rem;
-   }
-
-   .time-ampm {
-     font-size: 0.8rem;
-   }
-
-   .flight-arrow {
-     font-size: 0.85rem;
-     padding: 0 4px;
-   }
-
-   .flight-mid {
-     width: 100%;
-   }
-
-   .flight-codes {
-     font-size: 0.78rem;
-     gap: 6px;
-   }
-
-   .price-panel {
-     align-self: stretch;
-     margin-left: 0;
-     min-width: 0;
-   }
-
-   .price-big {
-     font-size: 1.6rem;
-   }
-
-   .time-advantage-box {
-     margin: 0 14px 14px 14px;
-     font-size: 0.78rem;
-   }
-
-   .rt-price-row {
-     padding: 14px 16px;
-   }
- 
-   .rt-price-text {
-     font-size: 1.35rem;
-   }
- }
- @media (max-width: 768px) {
-   .search-card-marker + div {
-     padding: 16px 14px !important;
-     margin-bottom: 1.2rem !important;
-   }
-
-   div[data-testid="stRadio"] {
-     margin-bottom: 0.4rem !important;
-   }
-
-   div[data-testid="stRadio"] div[role="radiogroup"] {
-     gap: 14px !important;
-   }
-
-   div[data-testid="stRadio"] label p {
-     font-size: 0.95rem !important;
-   }
-
-   div[data-testid="stButton"] > button {
-     min-height: 42px !important;
-     font-size: 0.9rem !important;
-   }
-
-   div[data-testid="column"] {
-     margin-bottom: 0.35rem !important;
-   }
-
-   div[data-testid="stSelectbox"] [data-baseweb="select"],
-   div[data-testid="stDateInput"] input {
-     min-height: 44px !important;
-     font-size: 0.95rem !important;
-   }
-
-   .stCaption, [data-testid="stCaptionContainer"] {
-     font-size: 0.78rem !important;
-     margin-bottom: 2px !important;
-   }
-
-   button[kind="secondary"]:has(div p) {
-     min-height: 40px !important;
-   }
- }
- @media (max-width: 768px) {
-   .element-container {
-     margin-bottom: 0.25rem !important;
-   }
-
-   div[data-testid="stVerticalBlock"] {
-     gap: 0.35rem !important;
-   }
-
-   div[data-testid="column"] {
-     padding-top: 0 !important;
-     padding-bottom: 0 !important;
-     margin-bottom: 0.15rem !important;
-   }
-
-   label, .stCaption, [data-testid="stCaptionContainer"] {
-     margin-top: 0 !important;
-     margin-bottom: 0.15rem !important;
-     padding-bottom: 0 !important;
-   }
-
-   div[data-testid="stRadio"] {
-     margin-bottom: 0.2rem !important;
-   }
-
-   div[data-testid="stRadio"] div[role="radiogroup"] {
-     gap: 18px !important;
-   }
-
-   div[data-testid="stButton"] > button {
-     min-height: 38px !important;
-     margin-top: 0 !important;
-     margin-bottom: 0 !important;
-     padding-top: 0.35rem !important;
-     padding-bottom: 0.35rem !important;
-   }
-
-   div[data-testid="stSelectbox"],
-   div[data-testid="stDateInput"] {
-     margin-bottom: 0.25rem !important;
-   }
-
-   div[data-testid="stSelectbox"] [data-baseweb="select"],
-   div[data-testid="stDateInput"] input {
-     min-height: 40px !important;
-   }
-
-   .search-card-marker + div {
-     padding: 12px 14px !important;
-   }
-
-   .banner {
-     margin-bottom: 0.65rem !important;
-   }
- }
- @media (max-width: 768px) {
-   .search-card-marker + div > div {
-     display: block !important;
-   }
-
-   .search-card-marker + div [data-testid="column"] {
-     width: 100% !important;
-     flex: 1 1 100% !important;
-     min-width: 100% !important;
-   }
-
-   .search-card-marker + div [data-testid="column"] [data-testid="column"] {
-     width: auto !important;
-     flex: 1 1 0 !important;
-     min-width: 0 !important;
-   }
- }
- @media (max-width: 420px) {
-   .block-container {
-     padding-left: 0.65rem !important;
-     padding-right: 0.65rem !important;
-   }
-
-   .search-card-marker + div {
-     padding: 12px 12px !important;
-     margin-bottom: 1rem !important;
-   }
-
-   .element-container {
-     margin-bottom: 0.35rem !important;
-   }
-
-   div[data-testid="stRadio"] div[role="radiogroup"] {
-     gap: 18px !important;
-     flex-wrap: nowrap !important;
-   }
-
-   div[data-testid="stRadio"] label p {
-     font-size: 0.9rem !important;
-   }
-
-   div[data-testid="stNumberInput"] input,
-   div[data-testid="stSelectbox"] [data-baseweb="select"],
-   div[data-testid="stDateInput"] input {
-     min-height: 42px !important;
-     font-size: 0.95rem !important;
-     background: white !important;
-     color: var(--dark) !important;
-   }
-
-   div[data-testid="stButton"] > button {
-     min-height: 40px !important;
-     font-size: 0.9rem !important;
-     margin: 0 !important;
-   }
-
-   label, .stCaption, [data-testid="stCaptionContainer"] {
-     font-size: 0.75rem !important;
-     margin-bottom: 2px !important;
-   }
-
-   .banner h1 {
-     font-size: 1.65rem !important;
-   }
-
-   .banner p {
-     font-size: 0.72rem !important;
-   }
- }
- </style>
+  .fdays-table td { padding:2px 2px; }
+  .fdays-route { font-size:.75rem; font-weight:800; color:var(--dark); }
+  .fdays-city { font-size:.65rem; color:var(--grey); }
+  .day-cell-on { background:#63F542; height:20px; border-radius:2px; }
+  .day-cell-off { background:#EF2B2B; height:20px; border-radius:2px; }
+</style>
 """, unsafe_allow_html=True)
 
 # ── Data ──────────────────────────────────────────────────────────────────────
@@ -1077,7 +805,7 @@ def render_flight_days_table():
     </div>""", unsafe_allow_html=True)
 
     days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    header = '<table class="fdays-table"><thead><tr><th>Route</th>'
+    header = '<div class="fdays-scroll"><table class="fdays-table"><thead><tr><th>Route</th>'
     for d in days:
         header += f'<th>{d}</th>'
     header += '</tr></thead><tbody>'
@@ -1092,7 +820,7 @@ def render_flight_days_table():
             rows += f'<td><div class="{cls}"></div></td>'
         rows += '</tr>'
 
-    st.markdown(header + rows + '</tbody></table>', unsafe_allow_html=True)
+    st.markdown(header + rows + '</tbody></table></div>', unsafe_allow_html=True)
 
 # ── Session State ─────────────────────────────────────────────────────────────
 
@@ -1156,100 +884,125 @@ def swap_airports():
     st.session_state.dep_select = airport_options[code_to_index(st.session_state.depart_code)]
     st.session_state.arr_select = airport_options[code_to_index(st.session_state.arrive_code)]
 
-def is_mobile_view():
-    return st.session_state.get("mobile_layout", True)
-
 with st.container():
     st.markdown('<div class="search-card-marker"></div>', unsafe_allow_html=True)
 
+    # Row 1a: Trip type + Passengers side by side
+    r1a_cols = st.columns([1.6, 1.4])
+
+    with r1a_cols[0]:
+        st.caption("Trip Type")
+        trip_type = st.radio(
+            "trip_type_radio",
+            ["Round Trip", "One Way"],
+            index=0 if st.session_state.trip_type == "Round Trip" else 1,
+            horizontal=True,
+            label_visibility="collapsed",
+        )
+        st.session_state.trip_type = trip_type
+
+    with r1a_cols[1]:
+        st.caption("👤 Passengers")
+        p_col1, p_col2, p_col3 = st.columns([1, 0.7, 1])
+        with p_col1:
+            if st.button("−", key="pax_minus", use_container_width=True):
+                st.session_state.passengers = max(1, st.session_state.passengers - 1)
+        with p_col2:
+            st.markdown(
+                f"<div style='text-align:center;font-size:1.1rem;font-weight:bold;padding-top:10px'>{st.session_state.passengers}</div>",
+                unsafe_allow_html=True
+            )
+        with p_col3:
+            if st.button("＋", key="pax_plus", use_container_width=True):
+                st.session_state.passengers = min(9, st.session_state.passengers + 1)
+
+    # Row 1b: Booking type + Flight Days button
+    r1b_cols = st.columns([1.6, 1.4])
+
+    with r1b_cols[0]:
+        st.caption("Booking Type")
+        booking_mode = st.radio(
+            "booking_mode_radio",
+            ["Seat Booking", "Charter Aircraft"],
+            index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
+            horizontal=True,
+            label_visibility="collapsed",
+        )
+        st.session_state.booking_mode = booking_mode
+
+    with r1b_cols[1]:
+        st.markdown("<div style='height:26px'></div>", unsafe_allow_html=True)
+        if st.button("📅 Flight Days", use_container_width=True):
+            st.session_state.show_flight_days = not st.session_state.show_flight_days
+            st.rerun()
+
+    # Row 2: Airports and dates
     airport_options = [f"{code} – {city}" for code, city in AIRPORTS]
     airport_codes_list = [code for code, _ in AIRPORTS]
 
     def code_to_index(code):
         return airport_codes_list.index(code) if code in airport_codes_list else 0
 
-    st.caption("Trip Type")
-    trip_type = st.radio(
-        "trip_type_radio",
-        ["Round Trip", "One Way"],
-        index=0 if st.session_state.trip_type == "Round Trip" else 1,
-        horizontal=True,
-        label_visibility="collapsed",
-    )
-    st.session_state.trip_type = trip_type
+    r2_cols = st.columns([2.4, 0.4, 2.4])
 
-    st.caption("👤 Passengers")
-    st.session_state.passengers = st.number_input(
-        "passenger_count",
-        min_value=1,
-        max_value=9,
-        value=st.session_state.passengers,
-        step=1,
-        label_visibility="collapsed"
-    )
+    with r2_cols[0]:
+        st.caption("Departing")
+        dep_sel = st.selectbox(
+            "dep_sel", airport_options,
+            index=code_to_index(st.session_state.depart_code),
+            label_visibility="collapsed",
+            key="dep_select",
+            on_change=update_depart_code
+        )
 
-    st.caption("Booking Type")
-    booking_mode = st.radio(
-        "booking_mode_radio",
-        ["Seat Booking", "Charter Aircraft"],
-        index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
-        horizontal=True,
-        label_visibility="collapsed",
-    )
-    st.session_state.booking_mode = booking_mode
+    with r2_cols[1]:
+        st.caption("&nbsp;")
+        st.button(
+            "⇄",
+            key="swap_btn",
+            use_container_width=True,
+            on_click=swap_airports
+        )
 
-    if st.button("📅 View Flight Days", use_container_width=True):
-        st.session_state.show_flight_days = not st.session_state.show_flight_days
-        st.rerun()
-
-    st.caption("Departing")
-    dep_sel = st.selectbox(
-        "dep_sel",
-        airport_options,
-        index=code_to_index(st.session_state.depart_code),
-        label_visibility="collapsed",
-        key="dep_select",
-        on_change=update_depart_code
-    )
-
-    if st.button("⇄ Swap Airports", key="swap_btn", use_container_width=True, on_click=swap_airports):
-        pass
-
-    st.caption("Arriving")
-    arr_sel = st.selectbox(
-        "arr_sel",
-        airport_options,
-        index=code_to_index(st.session_state.arrive_code),
-        label_visibility="collapsed",
-        key="arr_select",
-        on_change=update_arrive_code
-    )
-
-    st.caption("Departure Date")
-    depart_date = st.date_input(
-        "depart_date_input",
-        value=st.session_state.depart_date,
-        min_value=date.today(),
-        label_visibility="collapsed",
-        key="dep_date_input"
-    )
-    st.session_state.depart_date = depart_date
+    with r2_cols[2]:
+        st.caption("Arriving")
+        arr_sel = st.selectbox(
+            "arr_sel", airport_options,
+            index=code_to_index(st.session_state.arrive_code),
+            label_visibility="collapsed",
+            key="arr_select",
+            on_change=update_arrive_code
+        )
 
     is_round = st.session_state.trip_type == "Round Trip"
-    st.caption("Return Date" if is_round else "Return Date (N/A)")
-    return_date = st.date_input(
-        "return_date_input",
-        value=st.session_state.return_date,
-        min_value=depart_date,
-        label_visibility="collapsed",
-        key="ret_date_input",
-        disabled=not is_round
-    )
-    if is_round:
-        st.session_state.return_date = return_date
+    date_cols = st.columns(2)
 
-    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
-    find_clicked = st.button("✈ FIND FLIGHTS", use_container_width=True, key="find_flights_btn")
+    with date_cols[0]:
+        st.caption("Departure Date")
+        depart_date = st.date_input(
+            "depart_date_input",
+            value=st.session_state.depart_date,
+            min_value=date.today(),
+            label_visibility="collapsed",
+            key="dep_date_input"
+        )
+        st.session_state.depart_date = depart_date
+
+    with date_cols[1]:
+        st.caption("Return Date" if is_round else "Return Date (N/A)")
+        return_date = st.date_input(
+            "return_date_input",
+            value=st.session_state.return_date,
+            min_value=depart_date,
+            label_visibility="collapsed",
+            key="ret_date_input",
+            disabled=not is_round
+        )
+        if is_round:
+            st.session_state.return_date = return_date
+
+    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+    find_clicked = st.button("✈  FIND FLIGHTS", use_container_width=True, key="find_flights_btn")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
