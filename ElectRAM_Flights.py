@@ -138,12 +138,6 @@ st.markdown("""
      padding: 18px 16px !important;
    }
 
-   div[data-testid="column"] {
-     width: 100% !important;
-     flex: 1 1 100% !important;
-     min-width: 100% !important;
-   }
-
    div[data-testid="stButton"] > button {
      width: 100% !important;
    }
@@ -311,6 +305,23 @@ st.markdown("""
 
    .banner {
      margin-bottom: 0.65rem !important;
+   }
+ }
+ @media (max-width: 768px) {
+   .search-card-marker + div > div {
+     display: block !important;
+   }
+
+   .search-card-marker + div [data-testid="column"] {
+     width: 100% !important;
+     flex: 1 1 100% !important;
+     min-width: 100% !important;
+   }
+
+   .search-card-marker + div [data-testid="column"] [data-testid="column"] {
+     width: auto !important;
+     flex: 1 1 0 !important;
+     min-width: 0 !important;
    }
  }
  </style>
