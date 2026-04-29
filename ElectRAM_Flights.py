@@ -1029,7 +1029,7 @@ with st.container():
     st.markdown('<div class="search-card-marker"></div>', unsafe_allow_html=True)
 
     # Row 1a: Trip type + Passengers side by side
-    r1a_cols = st.columns([2.2, 1.45])
+    r1a_cols = st.columns([2.2, 1.5])
 
     with r1a_cols[0]:
         # Removed st.caption("Trip Type") - was duplicating the radio widget's own label
