@@ -164,7 +164,6 @@ st.markdown("""
     div[data-testid="stRadio"] label p {
       font-size: 0.72rem !important;
       line-height: 1.1 !important;
-      white-space: nowrap !important;
     }
 
     div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
