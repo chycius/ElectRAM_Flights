@@ -187,6 +187,7 @@ st.markdown("""
 
     /* Fixed passenger number vertical alignment - removed bad translateY(-8px) offset */
     .pax-number {
+      transform: translateY(-40px) !important;
       height: 38px !important;
       display: flex !important;
       align-items: center !important;
