@@ -1045,7 +1045,7 @@ with st.container():
 
     with r1a_cols[1]:
         st.caption("👤 Passengers")
-        p_col1, p_col2, p_col3 = st.columns([0.85, 0.5, 0.85])
+        p_col1, p_col2, p_col3 = st.columns([0.65, 0.4, 0.65])
         with p_col1:
             if st.button("−", key="pax_minus", use_container_width=True):
                 st.session_state.passengers = max(1, st.session_state.passengers - 1)
