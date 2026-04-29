@@ -252,7 +252,7 @@ st.markdown("""
      min-height: 40px !important;
    }
  }
-  @media (max-width: 768px) {
+ @media (max-width: 768px) {
    .element-container {
      margin-bottom: 0.25rem !important;
    }
@@ -322,6 +322,58 @@ st.markdown("""
      width: auto !important;
      flex: 1 1 0 !important;
      min-width: 0 !important;
+   }
+ }
+ @media (max-width: 420px) {
+   .block-container {
+     padding-left: 0.65rem !important;
+     padding-right: 0.65rem !important;
+   }
+
+   .search-card-marker + div {
+     padding: 12px 12px !important;
+     margin-bottom: 1rem !important;
+   }
+
+   .element-container {
+     margin-bottom: 0.35rem !important;
+   }
+
+   div[data-testid="stRadio"] div[role="radiogroup"] {
+     gap: 18px !important;
+     flex-wrap: nowrap !important;
+   }
+
+   div[data-testid="stRadio"] label p {
+     font-size: 0.9rem !important;
+   }
+
+   div[data-testid="stNumberInput"] input,
+   div[data-testid="stSelectbox"] [data-baseweb="select"],
+   div[data-testid="stDateInput"] input {
+     min-height: 42px !important;
+     font-size: 0.95rem !important;
+     background: white !important;
+     color: var(--dark) !important;
+   }
+
+   div[data-testid="stButton"] > button {
+     min-height: 40px !important;
+     font-size: 0.9rem !important;
+     margin: 0 !important;
+   }
+
+   label, .stCaption, [data-testid="stCaptionContainer"] {
+     font-size: 0.75rem !important;
+     margin-bottom: 2px !important;
+   }
+
+   .banner h1 {
+     font-size: 1.65rem !important;
+   }
+
+   .banner p {
+     font-size: 0.72rem !important;
    }
  }
  </style>
@@ -1104,125 +1156,100 @@ def swap_airports():
     st.session_state.dep_select = airport_options[code_to_index(st.session_state.depart_code)]
     st.session_state.arr_select = airport_options[code_to_index(st.session_state.arrive_code)]
 
+def is_mobile_view():
+    return st.session_state.get("mobile_layout", True)
+
 with st.container():
     st.markdown('<div class="search-card-marker"></div>', unsafe_allow_html=True)
 
-    # Row 1: Trip type, passengers, booking mode, flight days button
-    r1_cols = st.columns([2.1, 1.8, 2.4, 1.9])
-
-    with r1_cols[0]:
-        st.caption("Trip Type")
-        trip_type = st.radio(
-            "trip_type_radio",
-            ["Round Trip", "One Way"],
-            index=0 if st.session_state.trip_type == "Round Trip" else 1,
-            horizontal=True,
-            label_visibility="collapsed",
-        )
-        st.session_state.trip_type = trip_type
-
-    with r1_cols[1]:
-        st.caption("👤 Passengers")
-        p_col1, p_col2, p_col3 = st.columns([1.1, 0.8, 1.1])
-        with p_col1:
-            if st.button("−", key="pax_minus", use_container_width=True):
-                st.session_state.passengers = max(1, st.session_state.passengers - 1)
-        with p_col2:
-            st.markdown(
-                f"<div style='text-align:center;font-size:1.2rem;font-weight:bold;padding-top:10px'>{st.session_state.passengers}</div>",
-                unsafe_allow_html=True
-            )
-        with p_col3:
-            if st.button("＋", key="pax_plus", use_container_width=True):
-                st.session_state.passengers = min(9, st.session_state.passengers + 1)
-
-    with r1_cols[2]:
-        st.caption("Booking Type")
-        booking_mode = st.radio(
-            "booking_mode_radio",
-            ["Seat Booking", "Charter Aircraft"],
-            index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
-            horizontal=True,
-            label_visibility="collapsed",
-        )
-        st.session_state.booking_mode = booking_mode
-
-    with r1_cols[3]:
-        st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-        if st.button("📅 View Flight Days", use_container_width=True):
-            st.session_state.show_flight_days = not st.session_state.show_flight_days
-            st.rerun()
-
-    # Row 2: Airports and dates
     airport_options = [f"{code} – {city}" for code, city in AIRPORTS]
     airport_codes_list = [code for code, _ in AIRPORTS]
 
     def code_to_index(code):
         return airport_codes_list.index(code) if code in airport_codes_list else 0
 
-    r2_cols = st.columns([2.1, 0.45, 2.1, 0.75, 2.0, 2.0])
+    st.caption("Trip Type")
+    trip_type = st.radio(
+        "trip_type_radio",
+        ["Round Trip", "One Way"],
+        index=0 if st.session_state.trip_type == "Round Trip" else 1,
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    st.session_state.trip_type = trip_type
 
-    with r2_cols[0]:
-        st.caption("Departing")
-        dep_sel = st.selectbox(
-            "dep_sel", airport_options,
-            index=code_to_index(st.session_state.depart_code),
-            label_visibility="collapsed",
-            key="dep_select",
-            on_change=update_depart_code
-        )       
+    st.caption("👤 Passengers")
+    st.session_state.passengers = st.number_input(
+        "passenger_count",
+        min_value=1,
+        max_value=9,
+        value=st.session_state.passengers,
+        step=1,
+        label_visibility="collapsed"
+    )
 
-    with r2_cols[1]:
-        st.caption("&nbsp;")
-        st.button(
-            "⇄",
-            key="swap_btn",
-            use_container_width=True,
-            on_click=swap_airports
-        )
+    st.caption("Booking Type")
+    booking_mode = st.radio(
+        "booking_mode_radio",
+        ["Seat Booking", "Charter Aircraft"],
+        index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    st.session_state.booking_mode = booking_mode
 
-    with r2_cols[2]:
-        st.caption("Arriving")
-        arr_sel = st.selectbox(
-            "arr_sel", airport_options,
-            index=code_to_index(st.session_state.arrive_code),
-            label_visibility="collapsed",
-            key="arr_select",
-            on_change=update_arrive_code
-        )
+    if st.button("📅 View Flight Days", use_container_width=True):
+        st.session_state.show_flight_days = not st.session_state.show_flight_days
+        st.rerun()
 
-    with r2_cols[3]:
-        st.write("")  # spacer
+    st.caption("Departing")
+    dep_sel = st.selectbox(
+        "dep_sel",
+        airport_options,
+        index=code_to_index(st.session_state.depart_code),
+        label_visibility="collapsed",
+        key="dep_select",
+        on_change=update_depart_code
+    )
 
-    with r2_cols[4]:
-        st.caption("Departure Date")
-        depart_date = st.date_input(
-            "depart_date_input",
-            value=st.session_state.depart_date,
-            min_value=date.today(),
-            label_visibility="collapsed",
-            key="dep_date_input"
-        )
-        st.session_state.depart_date = depart_date
+    if st.button("⇄ Swap Airports", key="swap_btn", use_container_width=True, on_click=swap_airports):
+        pass
 
-    with r2_cols[5]:
-        is_round = st.session_state.trip_type == "Round Trip"
-        st.caption("Return Date" if is_round else "Return Date (N/A)")
-        return_date = st.date_input(
-            "return_date_input",
-            value=st.session_state.return_date,
-            min_value=depart_date,
-            label_visibility="collapsed",
-            key="ret_date_input",
-            disabled=not is_round
-        )
-        if is_round:
-            st.session_state.return_date = return_date
+    st.caption("Arriving")
+    arr_sel = st.selectbox(
+        "arr_sel",
+        airport_options,
+        index=code_to_index(st.session_state.arrive_code),
+        label_visibility="collapsed",
+        key="arr_select",
+        on_change=update_arrive_code
+    )
 
-    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
-    btn_col, _ = st.columns([1, 4])
-    with btn_col:
-        find_clicked = st.button("✈  FIND FLIGHTS", use_container_width=True, key="find_flights_btn")
+    st.caption("Departure Date")
+    depart_date = st.date_input(
+        "depart_date_input",
+        value=st.session_state.depart_date,
+        min_value=date.today(),
+        label_visibility="collapsed",
+        key="dep_date_input"
+    )
+    st.session_state.depart_date = depart_date
+
+    is_round = st.session_state.trip_type == "Round Trip"
+    st.caption("Return Date" if is_round else "Return Date (N/A)")
+    return_date = st.date_input(
+        "return_date_input",
+        value=st.session_state.return_date,
+        min_value=depart_date,
+        label_visibility="collapsed",
+        key="ret_date_input",
+        disabled=not is_round
+    )
+    if is_round:
+        st.session_state.return_date = return_date
+
+    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+    find_clicked = st.button("✈ FIND FLIGHTS", use_container_width=True, key="find_flights_btn")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
