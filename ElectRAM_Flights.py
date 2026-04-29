@@ -1075,7 +1075,7 @@ with st.container():
         # Using label_visibility="visible" so the label renders once via Streamlit natively
         booking_mode = st.radio(
             "Booking Type",
-            ["Seat Bookin", "Charter"],
+            ["Seat Booki", "Charter"],
             index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
             horizontal=True,
             label_visibility="visible",
