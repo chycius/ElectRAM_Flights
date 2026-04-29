@@ -1077,7 +1077,7 @@ with st.container():
 
     with r1b_cols[1]:
         st.markdown("<div style='height:26px'></div>", unsafe_allow_html=True)
-        if st.button("📅 Flight Days", use_container_width=True):
+        if st.button("Flight Days", use_container_width=True):
             st.session_state.show_flight_days = not st.session_state.show_flight_days
             st.rerun()
 
