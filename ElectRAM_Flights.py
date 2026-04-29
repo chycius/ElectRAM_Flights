@@ -37,7 +37,7 @@ st.markdown("""
 
   /* ── Inputs ── */
   label, .stCaption, [data-testid="stCaptionContainer"] { color:var(--grey) !important; font-size:.76rem !important; }
-  div[data-testid="stRadio"] label p { color:var(--grey) !important; font-size:.88rem !important; }
+  div[data-testid="stRadio"] label p { color:var(--light-grey) !important; font-size:.88rem !important; }
   div[data-testid="stSelectbox"] div, div[data-testid="stDateInput"] div { color:var(--dark) !important; }
   div[data-testid="stSelectbox"] > div, div[data-testid="stDateInput"] > div { background:white !important; border:1px solid var(--border) !important; border-radius:2px !important; }
   div[data-testid="stDateInput"] input { background:white !important; color:var(--dark) !important; font-size:.85rem !important; }
