@@ -52,6 +52,8 @@ st.markdown("""
   div[data-testid="stButton"] > button { display:flex !important; align-items:center !important; justify-content:center !important; }
   div[data-testid="stAlert"] { color:var(--dark) !important; }
   div[data-testid="stAlert"] * { color:var(--dark) !important; }
+  /* Make +/- buttons same height as number */
+  div[data-testid="stButton"] > button { height: 42px !important; }
 
   /* ── Results header ── */
   .results-header { display:flex; flex-direction:column; gap:4px; margin:4px 0 8px 0; }
@@ -163,6 +165,20 @@ st.markdown("""
     div[data-testid="stDateInput"] input {
       min-height: 38px !important;
       font-size: 0.76rem !important;
+    }
+    
+    /* Align radio buttons + text vertically centered */
+    div[data-testid="stRadio"] label {
+      display: flex !important;
+      align-items: center !important;
+    gap: 6px !important;
+    }
+
+    /* Fix the text specifically */
+    div[data-testid="stRadio"] label p {
+      margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
     }
   }  
 </style>
@@ -970,7 +986,18 @@ with st.container():
                 st.session_state.passengers = max(1, st.session_state.passengers - 1)
         with p_col2:
             st.markdown(
-                f"<div style='text-align:center;font-size:1.1rem;font-weight:bold;padding-top:6px'>{st.session_state.passengers}</div>",
+                f"""
+                <div style="
+                   display:flex;
+                   align-items:center;
+                   justify-content:center;
+                   height:42px;
+                   font-size:1.1rem;
+                   font-weight:bold;
+                ">
+                    {st.session_state.passengers}
+                </div>
+                """,
                 unsafe_allow_html=True
             )
         with p_col3:
