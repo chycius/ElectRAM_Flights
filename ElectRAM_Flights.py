@@ -949,7 +949,7 @@ with st.container():
     st.markdown('<div class="search-card-marker"></div>', unsafe_allow_html=True)
 
     # Row 1a: Trip type + Passengers side by side
-    r1a_cols = st.columns([1.15, 1.25])
+    r1a_cols = st.columns([1.35, 1.25])
 
     with r1a_cols[0]:
         st.caption("Trip Type")
