@@ -55,6 +55,10 @@ st.markdown("""
   /* Make +/- buttons same height as number */
   div[data-testid="stButton"] > button { height: 42px !important; }
 
+  /* Collapse Streamlit's markdown wrapper bottom padding so passenger number sits flush with buttons */
+  .pax-num-wrap [data-testid="stMarkdownContainer"] { margin: 0 !important; padding: 0 !important; line-height: 1 !important; }
+  .pax-num-wrap { display: flex !important; align-items: center !important; justify-content: center !important; height: 42px !important; }
+
   /* ── Results header ── */
   .results-header { display:flex; flex-direction:column; gap:4px; margin:4px 0 8px 0; }
   .results-title { font-size:1.1rem; font-weight:800; color:var(--dark); }
@@ -1047,21 +1051,10 @@ with st.container():
             if st.button("−", key="pax_minus", use_container_width=True):
                 st.session_state.passengers = max(1, st.session_state.passengers - 1)
         with p_col2:
-            # Fixed passenger number vertical alignment - added margin-top to counteract align-items:end offset
+            # Using .pax-num-wrap class so CSS can strip Streamlit's markdown wrapper padding
+            # that was causing the number to sit too low relative to the − and + buttons
             st.markdown(
-                f"""
-                <div style="
-                   display:flex;
-                   align-items:center;
-                   justify-content:center;
-                   height:38px;
-                   margin-top:-4px;
-                   font-size:1.1rem;
-                   font-weight:bold;
-                ">
-                    {st.session_state.passengers}
-                </div>
-                """,
+                f'<div class="pax-num-wrap"><span style="font-size:1.1rem;font-weight:bold">{st.session_state.passengers}</span></div>',
                 unsafe_allow_html=True
             )
         with p_col3:
