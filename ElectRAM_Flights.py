@@ -93,7 +93,7 @@ st.markdown("""
   .ta-label { color:var(--maroon); font-weight:800; font-size:.7rem; margin-bottom:2px; }
   .ta-detail { color:var(--dark); }
 
-  /* Round trip card */
+  /* Round card */
   .rt-section-label { background:var(--section-bg); color:var(--grey); font-size:.7rem; font-weight:800; padding:6px 14px; border-bottom:1px solid var(--border); text-transform:uppercase; }
   .rt-divider { height:1px; background:var(--dark); margin:0; }
   .rt-price-row { background:var(--section-bg); border-top:1px solid var(--border); padding:10px 14px 14px 14px; display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
@@ -156,7 +156,7 @@ st.markdown("""
 
     div[data-testid="stRadio"] > div {
       flex-direction: row !important;
-      gap: 2px !important;
+      gap: 6px !important;
       flex-wrap: nowrap !important;
     }
 
@@ -851,7 +851,7 @@ def render_round_trip_card(out_f, ret_f, key, booking_mode, passengers):
       {ret_ta_html}
       <div class="rt-price-row">
         <div>
-          <span class="rt-price-text">Round Trip Total: ${total_price}</span>
+          <span class="rt-price-text">Round Total: ${total_price}</span>
           &nbsp;&nbsp;{savings_html}
         </div>
       </div>
@@ -870,7 +870,7 @@ def render_round_trip_card(out_f, ret_f, key, booking_mode, passengers):
             passenger_line = f"Passengers: {passengers}"
             final_total = total_price * passengers
 
-        st.success("Round Trip Selected ✔")
+        st.success("Round Selected ✔")
 
         st.markdown(f"""
         <div style="
@@ -921,7 +921,7 @@ def render_flight_days_table():
 
 def init_state():
     defaults = {
-        "trip_type": "Round Trip",
+        "trip_type": "Round",
         "booking_mode": "Seats",
         "depart_code": "CRW",
         "arrive_code": "ATL",
@@ -1036,8 +1036,8 @@ with st.container():
         # Using label_visibility="visible" so the label renders once via Streamlit natively
         trip_type = st.radio(
             "Trip Type",
-            ["Round Trip", "One Way"],
-            index=0 if st.session_state.trip_type == "Round Trip" else 1,
+            ["Round", "One Way"],
+            index=0 if st.session_state.trip_type == "Round" else 1,
             horizontal=True,
             label_visibility="visible",
         )
@@ -1119,7 +1119,7 @@ with st.container():
             on_change=update_arrive_code
         )
 
-    is_round = st.session_state.trip_type == "Round Trip"
+    is_round = st.session_state.trip_type == "Round"
     date_cols = st.columns(2)
 
     with date_cols[0]:
@@ -1180,7 +1180,7 @@ if st.session_state.results and st.session_state.search_dep:
     arr_city = AIRPORT_CODES.get(arr, arr)
     booking_mode_key = "seat" if st.session_state.booking_mode == "Seats" else "charter"
     passengers = st.session_state.passengers
-    is_round = st.session_state.trip_type == "Round Trip"
+    is_round = st.session_state.trip_type == "Round"
     dep_dt = datetime.combine(st.session_state.depart_date, datetime.min.time())
     ret_dt = datetime.combine(st.session_state.return_date, datetime.min.time())
     def fmt_display_date(d):
@@ -1200,16 +1200,16 @@ if st.session_state.results and st.session_state.search_dep:
         st.markdown(f"""
         <div class="results-header">
           <span class="results-title">{dep} &nbsp;✈&nbsp; {arr} &nbsp;✈&nbsp; {dep}</span>
-          <span class="results-sub">Round Trip &nbsp;·&nbsp; {dep_str} – {ret_str} &nbsp;·&nbsp; {passengers} passenger{"s" if passengers>1 else ""}</span>
+          <span class="results-sub">Round &nbsp;·&nbsp; {dep_str} – {ret_str} &nbsp;·&nbsp; {passengers} passenger{"s" if passengers>1 else ""}</span>
         </div>""", unsafe_allow_html=True)
 
-        st.markdown(f'<div class="section-header">ROUND TRIP &nbsp;·&nbsp; {dep} → {arr} &nbsp;·&nbsp; {dep_str} &nbsp;&nbsp;|&nbsp;&nbsp; {arr} → {dep} &nbsp;·&nbsp; {ret_str}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-header">Round &nbsp;·&nbsp; {dep} → {arr} &nbsp;·&nbsp; {dep_str} &nbsp;&nbsp;|&nbsp;&nbsp; {arr} → {dep} &nbsp;·&nbsp; {ret_str}</div>', unsafe_allow_html=True)
 
         if not outbound_flights or not return_flights:
             out_days = operating_days_text(dep, arr)
             ret_days = operating_days_text(arr, dep)
 
-            message = f"No round trip flights are available for the selected dates.\n\n"
+            message = f"No Round flights are available for the selected dates.\n\n"
 
             if not outbound_flights and out_days:
                 message += f"Outbound {dep} → {arr} operates on: **{out_days}**.\n\n"
