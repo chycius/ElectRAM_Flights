@@ -167,40 +167,30 @@ st.markdown("""
       font-size: 0.76rem !important;
     }
     
-    /* Align radio buttons + text vertically centered */
+    /* Consolidated radio label alignment - removed duplicate conflicting rules */
     div[data-testid="stRadio"] label {
       display: flex !important;
       align-items: center !important;
-    gap: 6px !important;
+      gap: 6px !important;
     }
 
-    /* Fix the text specifically */
+    /* Fixed radio label text - single clean rule replacing three conflicting ones */
     div[data-testid="stRadio"] label p {
       margin: 0 !important;
+      padding-bottom: 0 !important;
+      line-height: 1.05 !important;
       display: flex !important;
       align-items: center !important;
     }
-    
-    /* Pull passenger number upward between - and + */
+
+    /* Fixed passenger number vertical alignment - removed bad translateY(-8px) offset */
     .pax-number {
-      transform: translateY(-8px) !important;
       height: 38px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       font-size: 1.1rem !important;
       font-weight: 800 !important;
-    }
-
-    /* Center radio text beside circles */
-      div[data-testid="stRadio"] label {
-      align-items: center !important;
-    }
-
-    div[data-testid="stRadio"] label p {
-      margin-bottom: 0 !important;
-      padding-bottom: 0 !important;
-      line-height: 1.05 !important;
     }
   }  
 </style>
@@ -956,16 +946,64 @@ st.markdown("""
 if "show_demo_notice" not in st.session_state:
     st.session_state.show_demo_notice = True
 
+# Replaced st.warning + orange "Close notice" button with a clean custom card
+# that has a small orange ✕ button flush in the top-right corner of the box
 if st.session_state.show_demo_notice:
-    st.warning(
-        "⚠️ **Demo Project Notice**\n\n"
-        "This is a student design/demo application. ElectRAM Air is not a real airline or booking service. "
-        "No flights are actually being booked or operated."
-    )
+    st.markdown("""
+    <style>
+      .demo-notice-box {
+        position: relative;
+        background: #FFFBEA;
+        border: 1px solid #E5C97A;
+        border-left: 4px solid #E5751F;
+        border-radius: 4px;
+        padding: 12px 44px 12px 14px;
+        margin-bottom: 14px;
+        font-size: 0.82rem;
+        color: #1A1A2E;
+        line-height: 1.5;
+      }
+      .demo-notice-title {
+        font-weight: 800;
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+        color: #1A1A2E;
+      }
+      /* Style the Streamlit close button as a small ✕ in the top-right */
+      div[data-testid="stButton"].close-x-btn > button {
+        position: absolute !important;
+        top: 6px !important;
+        right: 8px !important;
+        background: transparent !important;
+        color: #E5751F !important;
+        border: none !important;
+        font-size: 1.1rem !important;
+        font-weight: 900 !important;
+        min-height: 24px !important;
+        height: 24px !important;
+        width: 24px !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+        box-shadow: none !important;
+      }
+      div[data-testid="stButton"].close-x-btn > button:hover {
+        background: transparent !important;
+        color: #861F41 !important;
+      }
+    </style>
+    <div class="demo-notice-box">
+      <div class="demo-notice-title">⚠️ Demo Project Notice</div>
+      This is a student design/demo application. ElectRAM Air is not a real airline or booking service.
+      No flights are actually being booked or operated.
+    </div>
+    """, unsafe_allow_html=True)
 
-    if st.button("Close notice", key="close_notice"):
-        st.session_state.show_demo_notice = False
-        st.rerun()
+    # Close button rendered as a small ✕; CSS above positions it inside the notice box
+    close_col, _ = st.columns([0.08, 0.92])
+    with close_col:
+        if st.button("✕", key="close_notice"):
+            st.session_state.show_demo_notice = False
+            st.rerun()
 
 # ── Search Card ───────────────────────────────────────────────────────────────
 
@@ -991,8 +1029,9 @@ with st.container():
 
     with r1a_cols[0]:
         st.caption("Trip Type")
+        # Changed label from "trip_type_radio" to "Trip Type" so if it ever renders it shows clean text
         trip_type = st.radio(
-            "trip_type_radio",
+            "Trip Type",
             ["Round Trip", "One Way"],
             index=0 if st.session_state.trip_type == "Round Trip" else 1,
             horizontal=True,
@@ -1007,13 +1046,14 @@ with st.container():
             if st.button("−", key="pax_minus", use_container_width=True):
                 st.session_state.passengers = max(1, st.session_state.passengers - 1)
         with p_col2:
+            # Replaced transform:translateY offset with clean flex centering for passenger count display
             st.markdown(
                 f"""
                 <div style="
                    display:flex;
                    align-items:center;
                    justify-content:center;
-                   height:42px;
+                   height:38px;
                    font-size:1.1rem;
                    font-weight:bold;
                 ">
@@ -1031,8 +1071,9 @@ with st.container():
 
     with r1b_cols[0]:
         st.caption("Booking Type")
+        # Changed label from "booking_mode_radio" to "Booking Type" so if it ever renders it shows clean text
         booking_mode = st.radio(
-            "booking_mode_radio",
+            "Booking Type",
             ["Seat Booking", "Charter Aircraft"],
             index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
             horizontal=True,
