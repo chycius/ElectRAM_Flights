@@ -57,7 +57,7 @@ st.markdown("""
 
   /* Collapse Streamlit's markdown wrapper bottom padding so passenger number sits flush with buttons */
   .pax-num-wrap [data-testid="stMarkdownContainer"] { margin: 0 !important; padding: 0 !important; line-height: 1 !important; }
-  .pax-num-wrap { display: flex !important; align-items: center !important; justify-content: center !important; height: 64px !important; }
+  .pax-num-wrap { display: flex !important; align-items: center !important; justify-content: center !important; height: 68px !important; }
 
   /* ── Results header ── */
   .results-header { display:flex; flex-direction:column; gap:4px; margin:4px 0 8px 0; }
