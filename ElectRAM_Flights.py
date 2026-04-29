@@ -1061,7 +1061,7 @@ with st.container():
                 st.session_state.passengers = min(9, st.session_state.passengers + 1)
 
     # Row 1b: Booking type + Flight Days button
-    r1b_cols = st.columns([1.b5, 1.25])
+    r1b_cols = st.columns([1.85, 1.25])
 
     with r1b_cols[0]:
         # Removed st.caption("Booking Type") - was duplicating the radio widget's own label
