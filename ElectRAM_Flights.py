@@ -156,9 +156,11 @@ st.markdown("""
       flex-wrap: nowrap !important;
     }
 
+    /* Reduced font size and added white-space nowrap to prevent "Seat Booking" wrapping to 3 lines */
     div[data-testid="stRadio"] label p {
-      font-size: 0.78rem !important;
+      font-size: 0.72rem !important;
       line-height: 1.1 !important;
+      white-space: nowrap !important;
     }
 
     div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
@@ -998,12 +1000,10 @@ if st.session_state.show_demo_notice:
     </div>
     """, unsafe_allow_html=True)
 
-    # Close button rendered as a small ✕; CSS above positions it inside the notice box
-    close_col, _ = st.columns([0.08, 0.92])
-    with close_col:
-        if st.button("✕", key="close_notice"):
-            st.session_state.show_demo_notice = False
-            st.rerun()
+    # Reverted close button back to labeled "Close notice" text button per user request
+    if st.button("Close notice", key="close_notice"):
+        st.session_state.show_demo_notice = False
+        st.rerun()
 
 # ── Search Card ───────────────────────────────────────────────────────────────
 
@@ -1028,14 +1028,14 @@ with st.container():
     r1a_cols = st.columns([1.55, 1.25])
 
     with r1a_cols[0]:
-        st.caption("Trip Type")
-        # Changed label from "trip_type_radio" to "Trip Type" so if it ever renders it shows clean text
+        # Removed st.caption("Trip Type") - was duplicating the radio widget's own label
+        # Using label_visibility="visible" so the label renders once via Streamlit natively
         trip_type = st.radio(
             "Trip Type",
             ["Round Trip", "One Way"],
             index=0 if st.session_state.trip_type == "Round Trip" else 1,
             horizontal=True,
-            label_visibility="collapsed",
+            label_visibility="visible",
         )
         st.session_state.trip_type = trip_type
 
@@ -1046,7 +1046,7 @@ with st.container():
             if st.button("−", key="pax_minus", use_container_width=True):
                 st.session_state.passengers = max(1, st.session_state.passengers - 1)
         with p_col2:
-            # Replaced transform:translateY offset with clean flex centering for passenger count display
+            # Fixed passenger number vertical alignment - added margin-top to counteract align-items:end offset
             st.markdown(
                 f"""
                 <div style="
@@ -1054,6 +1054,7 @@ with st.container():
                    align-items:center;
                    justify-content:center;
                    height:38px;
+                   margin-top:-4px;
                    font-size:1.1rem;
                    font-weight:bold;
                 ">
@@ -1070,14 +1071,14 @@ with st.container():
     r1b_cols = st.columns([1.55, 1.25])
 
     with r1b_cols[0]:
-        st.caption("Booking Type")
-        # Changed label from "booking_mode_radio" to "Booking Type" so if it ever renders it shows clean text
+        # Removed st.caption("Booking Type") - was duplicating the radio widget's own label
+        # Using label_visibility="visible" so the label renders once via Streamlit natively
         booking_mode = st.radio(
             "Booking Type",
             ["Seat Booking", "Charter Aircraft"],
             index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
             horizontal=True,
-            label_visibility="collapsed",
+            label_visibility="visible",
         )
         st.session_state.booking_mode = booking_mode
 
