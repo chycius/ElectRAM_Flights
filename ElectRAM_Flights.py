@@ -180,6 +180,28 @@ st.markdown("""
       display: flex !important;
       align-items: center !important;
     }
+    
+    /* Pull passenger number upward between - and + */
+    .pax-number {
+      transform: translateY(-18px) !important;
+      height: 38px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 1.1rem !important;
+      font-weight: 800 !important;
+    }
+
+    /* Center radio text beside circles */
+      div[data-testid="stRadio"] label {
+      align-items: center !important;
+    }
+
+    div[data-testid="stRadio"] label p {
+      margin-bottom: 0 !important;
+      padding-bottom: 0 !important;
+      line-height: 1.05 !important;
+    }
   }  
 </style>
 """, unsafe_allow_html=True)
