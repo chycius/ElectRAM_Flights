@@ -922,7 +922,7 @@ def render_flight_days_table():
 def init_state():
     defaults = {
         "trip_type": "Round Trip",
-        "booking_mode": "Seat Booking",
+        "booking_mode": "Book Seats",
         "depart_code": "CRW",
         "arrive_code": "ATL",
         "passengers": 1,
@@ -1069,7 +1069,7 @@ with st.container():
         booking_mode = st.radio(
             "Booking Type",
             ["Book Seats", "Charter"],
-            index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
+            index=0 if st.session_state.booking_mode == "Book Seats" else 1,
             horizontal=True,
             label_visibility="visible",
         )
@@ -1178,7 +1178,7 @@ if st.session_state.results and st.session_state.search_dep:
     arr = st.session_state.search_arr
     dep_city = AIRPORT_CODES.get(dep, dep)
     arr_city = AIRPORT_CODES.get(arr, arr)
-    booking_mode_key = "seat" if st.session_state.booking_mode == "Seat Booking" else "charter"
+    booking_mode_key = "seat" if st.session_state.booking_mode == "Book Seats" else "charter"
     passengers = st.session_state.passengers
     is_round = st.session_state.trip_type == "Round Trip"
     dep_dt = datetime.combine(st.session_state.depart_date, datetime.min.time())
