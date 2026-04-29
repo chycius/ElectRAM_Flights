@@ -258,6 +258,61 @@ st.markdown("""
      min-height: 40px !important;
    }
  }
+  @media (max-width: 768px) {
+   .element-container {
+     margin-bottom: 0.25rem !important;
+   }
+
+   div[data-testid="stVerticalBlock"] {
+     gap: 0.35rem !important;
+   }
+
+   div[data-testid="column"] {
+     padding-top: 0 !important;
+     padding-bottom: 0 !important;
+     margin-bottom: 0.15rem !important;
+   }
+
+   label, .stCaption, [data-testid="stCaptionContainer"] {
+     margin-top: 0 !important;
+     margin-bottom: 0.15rem !important;
+     padding-bottom: 0 !important;
+   }
+
+   div[data-testid="stRadio"] {
+     margin-bottom: 0.2rem !important;
+   }
+
+   div[data-testid="stRadio"] div[role="radiogroup"] {
+     gap: 18px !important;
+   }
+
+   div[data-testid="stButton"] > button {
+     min-height: 38px !important;
+     margin-top: 0 !important;
+     margin-bottom: 0 !important;
+     padding-top: 0.35rem !important;
+     padding-bottom: 0.35rem !important;
+   }
+
+   div[data-testid="stSelectbox"],
+   div[data-testid="stDateInput"] {
+     margin-bottom: 0.25rem !important;
+   }
+
+   div[data-testid="stSelectbox"] [data-baseweb="select"],
+   div[data-testid="stDateInput"] input {
+     min-height: 40px !important;
+   }
+
+   .search-card-marker + div {
+     padding: 12px 14px !important;
+   }
+
+   .banner {
+     margin-bottom: 0.65rem !important;
+   }
+ }
  </style>
 """, unsafe_allow_html=True)
 
@@ -1153,7 +1208,7 @@ with st.container():
         if is_round:
             st.session_state.return_date = return_date
 
-    st.write("")
+    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
     btn_col, _ = st.columns([1, 4])
     with btn_col:
         find_clicked = st.button("✈  FIND FLIGHTS", use_container_width=True, key="find_flights_btn")
