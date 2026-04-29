@@ -104,6 +104,61 @@ st.markdown("""
   .fdays-city { font-size:.65rem; color:var(--grey); }
   .day-cell-on { background:#63F542; height:20px; border-radius:2px; }
   .day-cell-off { background:#EF2B2B; height:20px; border-radius:2px; }
+    /* ── Force compact mobile layout instead of Streamlit stacking ── */
+  @media (max-width: 640px) {
+    .block-container {
+      max-width: 480px !important;
+      padding-left: 13px !important;
+      padding-right: 13px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 8px !important;
+      align-items: end !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] > div {
+      width: auto !important;
+      flex: 1 1 0 !important;
+      min-width: 0 !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] > div:has(#swap_btn) {
+      flex: 0 0 42px !important;
+      max-width: 42px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] > div:has(#pax_minus),
+    div[data-testid="stHorizontalBlock"] > div:has(#pax_plus) {
+      flex: 0 0 64px !important;
+      max-width: 64px !important;
+    }
+
+    div[data-testid="stButton"] > button {
+      min-height: 42px !important;
+      padding: 0 8px !important;
+      font-size: 0.9rem !important;
+    }
+
+    div[data-testid="stRadio"] {
+      margin-bottom: 0 !important;
+    }
+
+    div[data-testid="stRadio"] > div {
+      flex-direction: row !important;
+      gap: 12px !important;
+      flex-wrap: nowrap !important;
+    }
+
+    div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+    div[data-testid="stDateInput"] input {
+      min-height: 42px !important;
+      font-size: 0.8rem !important;
+    }
+  }
 </style>
 """, unsafe_allow_html=True)
 
@@ -888,7 +943,7 @@ with st.container():
     st.markdown('<div class="search-card-marker"></div>', unsafe_allow_html=True)
 
     # Row 1a: Trip type + Passengers side by side
-    r1a_cols = st.columns([1.6, 1.4])
+    r1a_cols = st.columns([1.25, 1.0])
 
     with r1a_cols[0]:
         st.caption("Trip Type")
@@ -917,7 +972,7 @@ with st.container():
                 st.session_state.passengers = min(9, st.session_state.passengers + 1)
 
     # Row 1b: Booking type + Flight Days button
-    r1b_cols = st.columns([1.6, 1.4])
+    r1b_cols = st.columns([1.25, 1.0])
 
     with r1b_cols[0]:
         st.caption("Booking Type")
