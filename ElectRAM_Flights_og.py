@@ -5,10 +5,10 @@ import copy
 
 # Copy and paste the following line into your terminal to run the app:
 # Save to update new code thats been added/changed
-# streamlit run ElectRAM_Flights_Web.py
+# streamlit run ElectRAM_Flights_og.py
 
-# This is the version of the code prior to most of the UI rendering logic being 
-# converted for phone use 
+# This is the version of the code used for the mobile UI redesign.
+# Also the version of the code that was used prior to intial route overhaul.
 
 # ── Page Config ───────────────────────────────────────────────────────────────
 st.set_page_config(
