@@ -228,10 +228,13 @@ def route_type(dep, arr):
 
 def default_departure_times(dep, arr, direct=True):
     """Return demo departure times by route type."""
+    rtype = route_type(dep, arr)
+
     if not direct:
+        if rtype == "small_small":
+            return [(13, 0)]
         return [(8, 0), (11, 0), (14, 0)]
 
-    rtype = route_type(dep, arr)
 
     if rtype == "big_big":
         return [(8, 0), (10, 30), (13, 0), (15, 30), (18, 0)]
@@ -245,7 +248,8 @@ def default_departure_times(dep, arr, direct=True):
         return [(9, 0), (16, 30)]
 
     if rtype == "small_small":
-        return [(9, 30), (16, 0)]
+        # Small-small demo routes should only show one direct frequency per day.
+        return [(9, 30)]
 
     return [(9, 0), (13, 0), (17, 0)]
 
@@ -480,13 +484,14 @@ def build_connection_itineraries(dep, arr, d, count=5):
 def generate_multileg_flights(dep, arr, d, count=5):
     direct = generate_flights(dep, arr, d, count)
 
-    # Small → small searches should show the demo network behavior:
-    # one nearby direct small-airport hop, plus hub-connected options to reach farther small airports.
+    # Small → small searches should show limited demo frequency:
+    #   1 direct closest-small-airport option, when that direct route exists
+    #   1 multileg hub-connected option, when a valid connection exists
     if dep in SMALL_AIRPORTS and arr in SMALL_AIRPORTS:
-        connection_options = build_connection_itineraries(dep, arr, d, count)
+        direct = direct[:1]
+        connection_options = build_connection_itineraries(dep, arr, d, 1)[:1]
 
         if direct and connection_options:
-            # Keep the closest-small-airport direct flights first, then show hub-connection choices.
             return direct + connection_options, "small_small_mixed"
 
         if direct:
