@@ -1,20 +1,20 @@
 import streamlit as st
 from datetime import date, datetime, timedelta
-
-from electram_routes import *
+import math
+import copy
 
 # Copy and paste the following line into your terminal to run the app:
 # Save to update new code thats been added/changed
 # streamlit run ElectRAM_Flights_Web.py
 
 # This is the version of the code prior to most of the UI rendering logic being 
-# converted for phone use 
+# converted for phone use
 
 # ── Page Config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="ElectRAM – Flight Search",
     page_icon="✈",
-    layout="centered",
+    layout="wide",
 )
 
 # ── Custom CSS ────────────────────────────────────────────────────────────────
@@ -23,188 +23,440 @@ st.markdown("""
   :root { --bg:#F7F8FA; --white:#FFFFFF; --dark:#1A1A2E; --grey:#75787b; --light-grey:#E5E7EB; --border:#D1D5DB; --section-bg:#F3F4F6; --gold:#B8860B; --maroon:#861F41; --orange:#E5751F; --red-light:#FFF1F3; }
   html, body, .stApp, [data-testid="stAppViewContainer"] { background: var(--bg) !important; color: var(--dark) !important; font-family: "Segoe UI", Arial, sans-serif !important; }
   [data-testid="stHeader"] { background: transparent !important; }
-  .block-container { max-width: 480px !important; padding-top:0 !important; padding-left:.75rem !important; padding-right:.75rem !important; }
+  .block-container { max-width: 1280px !important; padding-top:0 !important; padding-left:1.8rem !important; padding-right:1.8rem !important; }
   #MainMenu, footer, header { visibility:hidden; }
-
-  /* ── Banner ── */
-  .banner { background:var(--maroon); color:white; padding:16px 16px 12px 16px; margin:0 -.75rem 1rem -.75rem; text-align:center; border-bottom:1px solid #74203A; }
-  .banner h1 { font-family:Georgia,serif; font-size:1.65rem; font-weight:700; margin:0; line-height:1.1; letter-spacing:.2px; }
-  .banner p { font-size:.76rem; color:#AAB0B8; margin:5px 0 0 0; }
-
-  /* ── Search card ── */
-  .search-card-marker { display:none; }
-  .search-card-marker + div { background:white; border:1px solid var(--border); padding:14px 14px; margin:0 0 1rem 0; border-radius:4px !important; box-shadow:none; }
-
-  /* ── Inputs ── */
-  label, .stCaption, [data-testid="stCaptionContainer"] { color:var(--grey) !important; font-size:.76rem !important; }
-  div[data-testid="stRadio"] label p { color:var(--grey) !important; font-size:.88rem !important; }
-  div[data-testid="stSelectbox"] div, div[data-testid="stDateInput"] div { color:var(--dark) !important; }
-  div[data-testid="stSelectbox"] > div, div[data-testid="stDateInput"] > div { background:white !important; border:1px solid var(--border) !important; border-radius:2px !important; }
-  div[data-testid="stDateInput"] input { background:white !important; color:var(--dark) !important; font-size:.85rem !important; }
-  div[data-testid="stSelectbox"] [data-baseweb="select"] { background:white !important; }
-  div[data-testid="stSelectbox"] [data-baseweb="select"] > div { background:white !important; color:var(--dark) !important; font-size:.85rem !important; }
-  div[data-testid="stSelectbox"] [data-baseweb="select"] * { background-color:white !important; color:var(--dark) !important; }
-  div[data-testid="stSelectbox"] [data-baseweb="select"] svg { fill:var(--dark) !important; }
-
-  /* ── Buttons ── */
-  div[data-testid="stButton"] > button { background:var(--orange) !important; color:white !important; border:none !important; border-radius:2px !important; font-weight:700 !important; min-height:42px; font-size:.88rem !important; box-shadow:none !important; }
-  div[data-testid="stButton"] > button:hover { background:var(--maroon) !important; color:white !important; }
-  div[data-testid="stButton"] > button { display:flex !important; align-items:center !important; justify-content:center !important; }
-  div[data-testid="stAlert"] { color:var(--dark) !important; }
-  div[data-testid="stAlert"] * { color:var(--dark) !important; }
-  /* Make +/- buttons same height as number */
-  div[data-testid="stButton"] > button { height: 34px !important; }
-
-  /* Collapse Streamlit's markdown wrapper bottom padding so passenger number sits flush with buttons */
-  .pax-num-wrap [data-testid="stMarkdownContainer"] { margin: 0 !important; padding: 0 !important; line-height: 1 !important; }
-  .pax-num-wrap { display: flex !important; align-items: center !important; justify-content: center !important; height: 42px !important; padding-bottom: 20px !important; }
-
-  /* ── Results header ── */
-  .results-header { display:flex; flex-direction:column; gap:4px; margin:4px 0 8px 0; }
-  .results-title { font-size:1.1rem; font-weight:800; color:var(--dark); }
-  .results-sub { font-size:.76rem; color:var(--grey); }
-  .section-header { background:var(--section-bg); border:1px solid var(--border); color:var(--grey); font-size:.7rem; font-weight:800; padding:7px 12px; letter-spacing:.4px; margin-bottom:0; text-transform:uppercase; white-space:normal; word-break:break-word; }
-
-  /* ── Flight card – stacked mobile layout ── */
-  .flight-card { background:var(--white); border:1px solid var(--border); margin:0 0 12px 0; overflow:hidden; }
-  .flight-card-popular-banner { background:var(--section-bg); color:var(--gold); font-weight:800; font-size:.7rem; text-align:right; padding:5px 12px; border-bottom:1px solid var(--border); }
-  .flight-card-body { display:flex; flex-direction:column; padding:12px 14px 10px 14px; gap:10px; }
-
-  /* Times row */
-  .flight-times { display:flex; align-items:baseline; gap:6px; justify-content:center; white-space:nowrap; }
-  .time-big { font-family:Georgia,serif; font-size:1.7rem; font-weight:800; color:var(--dark); line-height:1; }
-  .time-ampm { font-family:Georgia,serif; font-size:.82rem; font-weight:800; color:var(--grey); }
-  .flight-arrow { color:var(--grey); font-size:.9rem; padding:0 6px; }
-
-  /* Mid: duration + codes */
-  .flight-mid { display:flex; flex-direction:column; align-items:stretch; gap:3px; }
-  .flight-dur { text-align:center; font-weight:800; font-size:.88rem; margin-bottom:4px; }
-  .dur-nonstop { color:var(--grey); } .dur-stop { color:var(--orange); }
-  .flight-divider { height:2px; background:var(--grey); margin:4px 0 6px 0; }
-  .flight-codes { display:flex; justify-content:center; align-items:center; gap:6px; color:var(--grey); font-size:.78rem; flex-wrap:wrap; }
-  .flight-code-bold { font-weight:900; color:var(--dark); }
-
-  /* Price panel – full-width strip at bottom of card on mobile */
-  .price-panel { background:var(--section-bg); border:1px solid var(--border); border-left:none; border-right:none; border-bottom:none; padding:10px 14px 8px 14px; text-align:center; display:flex; flex-direction:row; justify-content:center; align-items:center; gap:14px; margin-top:4px; }
-  .price-big { font-family:Georgia,serif; color:var(--dark); font-size:1.55rem; font-weight:800; line-height:1.1; }
-  .seats-left { color:var(--orange); font-size:.76rem; }
-  .connection-note { color:var(--grey); font-size:.76rem; padding:0 14px 8px 14px; }
-  .time-advantage-box { background:var(--red-light); border:1px solid var(--border); margin:0 12px 10px 12px; padding:8px 12px; font-size:.78rem; }
-  .ta-label { color:var(--maroon); font-weight:800; font-size:.7rem; margin-bottom:2px; }
-  .ta-detail { color:var(--dark); }
-
-  /* Round card */
-  .rt-section-label { background:var(--section-bg); color:var(--grey); font-size:.7rem; font-weight:800; padding:6px 14px; border-bottom:1px solid var(--border); text-transform:uppercase; }
-  .rt-divider { height:1px; background:var(--dark); margin:0; }
-  .rt-price-row { background:var(--section-bg); border-top:1px solid var(--border); padding:10px 14px 14px 14px; display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
-  .rt-price-text { font-family:Georgia,serif; font-size:1.35rem; font-weight:800; color:var(--dark); }
-  .savings-note { color:var(--grey); font-weight:800; font-size:.76rem; }
-
-  /* Flight days table – horizontal scroll */
-  .fdays-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  .fdays-table { width:100%; border-collapse:collapse; background:white; min-width:340px; }
-  .fdays-table th { font-size:.72rem; color:var(--dark); padding:5px 5px; text-align:center; }
-  .fdays-table th:first-child { text-align:left; }
-  .fdays-table td { padding:2px 2px; }
-  .fdays-route { font-size:.75rem; font-weight:800; color:var(--dark); }
-  .fdays-city { font-size:.65rem; color:var(--grey); }
-  .day-cell-on { background:#63F542; height:20px; border-radius:2px; }
-  .day-cell-off { background:#EF2B2B; height:20px; border-radius:2px; }
-    @media (max-width: 640px) {
-    .block-container {
-      padding-left: 13px !important;
-      padding-right: 13px !important;
-    }
-
-    div[data-testid="stHorizontalBlock"] {
-      display: flex !important;
-      flex-direction: row !important;
-      flex-wrap: nowrap !important;
-      gap: 10px !important;
-      align-items: end !important;
-    }
-
-    div[data-testid="stHorizontalBlock"] > div {
-      min-width: 0 !important;
-    }
-
-    /* Any 3-column row: airport row + passenger buttons */
-    div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(2) {
-      flex: 0 0 44px !important;
-      max-width: 44px !important;
-    }
-
-    /* Nested passenger - / number / + row */
-    div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(1),
-    div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(3) {
-      flex: 0 0 42px !important;
-      max-width: 42px !important;
-    }
-
-    div[data-testid="stHorizontalBlock"] div[data-testid="stHorizontalBlock"]:has(> div:nth-child(3):last-child) > div:nth-child(2) {
-      flex: 0 0 28px !important;
-      max-width: 28px !important;
-    }
-
-    div[data-testid="stButton"] > button {
-      min-height: 38px !important;
-      height: 38px !important;
-      padding: 0 8px !important;
-      font-size: 0.82rem !important;
-      white-space: nowrap !important;
-    }
-
-    div[data-testid="stRadio"] > div {
-      flex-direction: row !important;
-      gap: 10px !important;
-      flex-wrap: nowrap !important;
-    }
-
-    /* Reduced font size and added white-space nowrap to prevent "Seat Booking" wrapping to 3 lines */
-    div[data-testid="stRadio"] label p {
-      font-size: 0.72rem !important;
-      line-height: 1.1 !important;
-    }
-
-    div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
-    div[data-testid="stDateInput"] input {
-      min-height: 38px !important;
-      font-size: 0.76rem !important;
-    }
-    
-    /* Consolidated radio label alignment - removed duplicate conflicting rules */
-    div[data-testid="stRadio"] label {
-      display: flex !important;
-      align-items: center !important;
-      gap: 6px !important;
-    }
-
-    /* Fixed radio label text - single clean rule replacing three conflicting ones */
-    div[data-testid="stRadio"] label p {
-      margin: 0 !important;
-      padding-bottom: 0 !important;
-      line-height: 1.05 !important;
-      display: flex !important;
-      align-items: center !important;
-    }
-
-    /* Fixed passenger number vertical alignment - removed bad translateY(-8px) offset */
-    .pax-number {
-      transform: translateY(-200px) !important;
-      height: 38px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      font-size: 1.1rem !important;
-      font-weight: 800 !important;
-    }
+  .banner { background:var(--maroon); color:white; padding:28px 30px 22px 30px; margin:0 -1.8rem 1.4rem -1.8rem; text-align:center; border-bottom:1px solid #74203A; }
+  .banner h1 { font-family:Georgia,serif; font-size:2.55rem; font-weight:700; margin:0; line-height:1.1; letter-spacing:.2px; }
+  .banner p { font-size:.86rem; color:#AAB0B8; margin:8px 0 0 0; }
+  .search-card-marker {
+   display: none;
+  }
+  .search-card-marker + div {
+   background: white;
+   border: 1px solid var(--border);
+   padding: 26px 30px;
+   margin: 0 0 1.8rem 0;
+   border-radius: 2px !important;
+   box-shadow: none;
+  }
+  label, .stCaption, [data-testid="stCaptionContainer"] { color:var(--grey) !important; font-size:.82rem !important; }
+  div[data-testid="stRadio"] label p { color:var(--dark) !important; font-size:.98rem !important; }
+  div[data-testid="stSelectbox"] div,
+  div[data-testid="stDateInput"] div {
+   color: var(--dark) !important;
+  }
+  div[data-testid="stSelectbox"] > div,
+  div[data-testid="stDateInput"] > div {
+   background: white !important;
+   border: 1px solid var(--border) !important;
+   border-radius: 2px !important;
+  }
+  div[data-testid="stDateInput"] input {
+   background: white !important;
+   color: var(--dark) !important;
   }  
-</style>
+  div[data-testid="stButton"] > button { background:var(--orange) !important; color:white !important; border:none !important; border-radius:2px !important; font-weight:700 !important; min-height:44px; box-shadow:none !important; }
+  div[data-testid="stButton"] > button:hover { background:var(--maroon) !important; color:white !important; }
+  div[data-testid="stButton"] > button { display: flex !important; align-items: center !important; justify-content: center !important; }
+  div[data-testid="stSelectbox"] [data-baseweb="select"] {
+    background: white !important;
+  }
+  div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+    background: white !important;
+    color: var(--dark) !important;
+  }
+  div[data-testid="stSelectbox"] [data-baseweb="select"] * {
+    background-color: white !important;
+    color: var(--dark) !important;
+  }
+  div[data-testid="stSelectbox"] [data-baseweb="select"] svg {
+    fill: var(--dark) !important;
+  }
+  div[data-testid="stAlert"] { color: var(--dark) !important; }
+  div[data-testid="stAlert"] * { color: var(--dark) !important; }
+  .results-header { display:flex; align-items:baseline; gap:12px; margin:6px 0 10px 0; }
+  .results-title { font-size:1.35rem; font-weight:800; color:var(--dark); }
+  .results-sub { font-size:.85rem; color:var(--grey); }
+  .section-header { background:var(--section-bg); border:1px solid var(--border); color:var(--grey); font-size:.76rem; font-weight:800; padding:10px 16px; letter-spacing:.4px; margin-bottom:0; text-transform:uppercase; }
+  .flight-card { background:var(--white); border:1px solid var(--border); margin:0 0 18px 0; overflow:hidden; }
+  .flight-card-popular-banner { background:var(--section-bg); color:var(--gold); font-weight:800; font-size:.76rem; text-align:right; padding:6px 14px; border-bottom:1px solid var(--border); }
+  .flight-card-body { display:flex; align-items:center; min-height:120px; padding:16px 22px; gap:22px; }
+  .flight-times { display:flex; align-items:baseline; gap:8px; min-width:310px; white-space:nowrap; }
+  .time-big { font-family:Georgia,serif; font-size:2.05rem; font-weight:800; color:var(--dark); line-height:1; }
+  .time-ampm { font-family:Georgia,serif; font-size:.95rem; font-weight:800; color:var(--grey); }
+  .flight-arrow { color:var(--grey); font-size:1rem; padding:0 8px; }
+  .flight-mid { flex: 1; display:flex; flex-direction:column; align-items:stretch; gap:4px; }
+  .flight-dur { text-align:center; font-weight:800; font-size:.98rem; margin-bottom:6px; }
+  .dur-nonstop { color:var(--grey); } .dur-stop { color:var(--orange); }
+  .flight-divider { height:2px; background:var(--grey); margin:6px 0 8px 0; }
+  .flight-codes { display:flex; justify-content:center; align-items:center; gap:9px; color:var(--grey); font-size:.86rem; flex-wrap:wrap; }
+  .flight-code-bold { font-weight:900; color:var(--dark); }
+  .price-panel { background:var(--section-bg); border:1px solid var(--border); min-width:142px; padding:17px 18px 13px 18px; text-align:center; align-self:stretch; display:flex; flex-direction:column; justify-content:center; margin-left:auto; }
+  .price-big { font-family:Georgia,serif; color:var(--dark); font-size:1.85rem; font-weight:800; line-height:1.1; }
+  .seats-left { color:var(--orange); font-size:.82rem; margin-top:7px; }
+  .connection-note { color:var(--grey); font-size:.82rem; padding:0 24px 9px 24px; }
+  .time-advantage-box { background:var(--red-light); border:1px solid var(--border); margin:0 22px 14px 22px; padding:10px 16px; font-size:.84rem; }
+  .ta-label { color:var(--maroon); font-weight:800; font-size:.76rem; margin-bottom:3px; }
+  .ta-detail { color:var(--dark); }
+  .rt-section-label { background:var(--section-bg); color:var(--grey); font-size:.76rem; font-weight:800; padding:8px 18px; border-bottom:1px solid var(--border); text-transform:uppercase; }
+  .rt-divider { height:1px; background:var(--dark); margin:0; }
+  .rt-price-row {
+    background: var(--section-bg);
+    border-top: 1px solid var(--border);
+    padding: 14px 24px 22px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .rt-price-text { font-family:Georgia,serif; font-size:1.7rem; font-weight:800; color:var(--dark); }
+  .savings-note { color:var(--grey); font-weight:800; font-size:.82rem; }
+  .fdays-table { width:100%; border-collapse:collapse; background:white; }
+  .fdays-table th { font-size:.8rem; color:var(--dark); padding:7px 8px; text-align:center; }
+  .fdays-table th:first-child { text-align:left; }
+  .fdays-table td { padding:3px 2px; }
+  .fdays-route { font-size:.82rem; font-weight:800; color:var(--dark); }
+  .fdays-city { font-size:.72rem; color:var(--grey); }
+  .day-cell-on { background:#63F542; height:26px; border-radius:2px; }
+  .day-cell-off { background:#EF2B2B; height:26px; border-radius:2px; }
+  @media (max-width:900px) { .flight-card-body { flex-direction:column; align-items:stretch; } .flight-times { min-width:0; justify-content:center; } .price-panel { align-self:auto; } }
+ </style>
 """, unsafe_allow_html=True)
 
-# ── Shared Route/Data Logic ─────────────────────────────────────────────────────
-# Airports, routes, route days, drive times, pricing, flight generation,
-# connection logic, and booking-mode handling are imported from electram_routes.py.
+# ── Data ──────────────────────────────────────────────────────────────────────
+
+AIRPORTS = [
+    ("CRW", "Charleston, WV"),
+    ("ATL", "Atlanta, GA"),
+    ("CLT", "Charlotte, NC"),
+    ("ROA", "Roanoke, VA"),
+    ("TRI", "Tri-Cities, TN"),
+    ("LEX", "Lexington, KY"),
+    ("CKB", "Clarksburg/Bridgeport, WV"),
+    ("MGW", "Morgantown, WV"),
+    ("BNA", "Nashville, TN"),
+    ("IND", "Indianapolis, IN"),
+    ("SDF", "Louisville, KY"),
+    ("HTS", "Huntington, WV"),
+    ("SHD", "Shenandoah Valley, VA"),
+]
+
+AIRPORT_CODES = {code: city for code, city in AIRPORTS}
+
+ROUTES = {
+    ("CRW", "ATL"): {"dur_h": 1, "dur_m": 20},
+    ("CRW", "CLT"): {"dur_h": 1, "dur_m": 0},
+    ("CRW", "ROA"): {"dur_h": 0, "dur_m": 35},
+    ("CRW", "TRI"): {"dur_h": 0, "dur_m": 50},
+    ("CRW", "LEX"): {"dur_h": 0, "dur_m": 45},
+    ("CRW", "CKB"): {"dur_h": 0, "dur_m": 25},
+    ("CRW", "MGW"): {"dur_h": 0, "dur_m": 30},
+    ("CRW", "BNA"): {"dur_h": 1, "dur_m": 15},
+    ("CRW", "IND"): {"dur_h": 1, "dur_m": 20},
+    ("CRW", "SDF"): {"dur_h": 1, "dur_m": 0},
+    ("CRW", "HTS"): {"dur_h": 0, "dur_m": 25},
+    ("CRW", "SHD"): {"dur_h": 0, "dur_m": 45},
+    ("ROA", "CLT"): {"dur_h": 0, "dur_m": 50},
+    ("CLT", "ATL"): {"dur_h": 1, "dur_m": 5},
+    ("ATL", "CLT"): {"dur_h": 1, "dur_m": 5},
+    ("TRI", "ATL"): {"dur_h": 1, "dur_m": 10},
+    ("LEX", "IND"): {"dur_h": 0, "dur_m": 50},
+    ("HTS", "CLT"): {"dur_h": 1, "dur_m": 10},
+    ("SHD", "CLT"): {"dur_h": 1, "dur_m": 15},
+    ("ROA", "CRW"): {"dur_h": 0, "dur_m": 35},
+    ("CLT", "CRW"): {"dur_h": 1, "dur_m": 0},
+    ("ATL", "CRW"): {"dur_h": 1, "dur_m": 20},
+    ("TRI", "CLT"): {"dur_h": 1, "dur_m": 0},
+    ("CLT", "TRI"): {"dur_h": 1, "dur_m": 0},
+    ("LEX", "CLT"): {"dur_h": 1, "dur_m": 10},
+    ("CLT", "LEX"): {"dur_h": 1, "dur_m": 10},
+    ("SDF", "CLT"): {"dur_h": 1, "dur_m": 15},
+    ("CLT", "SDF"): {"dur_h": 1, "dur_m": 15},
+    ("BNA", "ATL"): {"dur_h": 1, "dur_m": 5},
+    ("ATL", "BNA"): {"dur_h": 1, "dur_m": 5},
+    ("BNA", "CLT"): {"dur_h": 1, "dur_m": 20},
+    ("CLT", "BNA"): {"dur_h": 1, "dur_m": 20},
+    ("IND", "CLT"): {"dur_h": 1, "dur_m": 25},
+    ("CLT", "IND"): {"dur_h": 1, "dur_m": 25},
+    ("MGW", "CRW"): {"dur_h": 0, "dur_m": 30},
+    ("CKB", "CRW"): {"dur_h": 0, "dur_m": 25},
+    ("HTS", "CRW"): {"dur_h": 0, "dur_m": 25},
+    ("SHD", "CRW"): {"dur_h": 0, "dur_m": 45},
+}
+
+ROUTE_DAYS = {
+    ("CRW", "ATL"): [0, 1, 2, 3, 4, 5, 6],
+    ("CRW", "CLT"): [0, 1, 2, 3, 4, 5, 6],
+    ("CRW", "ROA"): [0, 2, 4],
+    ("CRW", "TRI"): [1, 3, 5],
+    ("CRW", "LEX"): [0, 3, 6],
+    ("CRW", "CKB"): [0, 1, 2, 3, 4],
+    ("CRW", "MGW"): [0, 1, 2, 3, 4],
+    ("CRW", "BNA"): [1, 4, 6],
+    ("CRW", "IND"): [0, 2, 5],
+    ("CRW", "SDF"): [1, 3, 6],
+    ("CRW", "HTS"): [0, 1, 2, 3, 4],
+    ("CRW", "SHD"): [2, 5],
+    ("ROA", "CLT"): [0, 1, 2, 3, 4, 5, 6],
+    ("CLT", "ATL"): [0, 1, 2, 3, 4, 5, 6],
+    ("ATL", "CLT"): [0, 1, 2, 3, 4, 5, 6],
+    ("TRI", "ATL"): [0, 2, 4],
+    ("LEX", "IND"): [1, 3, 5],
+    ("HTS", "CLT"): [0, 2, 4],
+    ("SHD", "CLT"): [1, 4],
+    ("ROA", "CRW"): [0, 2, 4],
+    ("CLT", "CRW"): [0, 1, 2, 3, 4, 5, 6],
+    ("ATL", "CRW"): [0, 1, 2, 3, 4, 5, 6],
+    ("TRI", "CLT"): [1, 3, 5],
+    ("CLT", "TRI"): [1, 3, 5],
+    ("LEX", "CLT"): [0, 3, 6],
+    ("CLT", "LEX"): [0, 3, 6],
+    ("SDF", "CLT"): [1, 3, 6],
+    ("CLT", "SDF"): [1, 3, 6],
+    ("BNA", "ATL"): [1, 4, 6],
+    ("ATL", "BNA"): [1, 4, 6],
+    ("BNA", "CLT"): [1, 4, 6],
+    ("CLT", "BNA"): [1, 4, 6],
+    ("IND", "CLT"): [0, 2, 5],
+    ("CLT", "IND"): [0, 2, 5],
+    ("MGW", "CRW"): [0, 1, 2, 3, 4],
+    ("CKB", "CRW"): [0, 1, 2, 3, 4],
+    ("HTS", "CRW"): [0, 1, 2, 3, 4],
+    ("SHD", "CRW"): [2, 5],
+}
+
+DRIVE_TIMES = {
+    ("CRW", "ATL"): {"h": 7, "m": 0},
+    ("CRW", "CLT"): {"h": 4, "m": 15},
+    ("CRW", "ROA"): {"h": 2, "m": 45},
+    ("CRW", "TRI"): {"h": 3, "m": 25},
+    ("CRW", "LEX"): {"h": 2, "m": 50},
+    ("CRW", "CKB"): {"h": 2, "m": 5},
+    ("CRW", "MGW"): {"h": 2, "m": 35},
+    ("CRW", "BNA"): {"h": 6, "m": 15},
+    ("CRW", "IND"): {"h": 5, "m": 45},
+    ("CRW", "SDF"): {"h": 4, "m": 0},
+    ("CRW", "HTS"): {"h": 1, "m": 0},
+    ("CRW", "SHD"): {"h": 4, "m": 0},
+    ("ROA", "CLT"): {"h": 3, "m": 0},
+    ("CLT", "ATL"): {"h": 4, "m": 15},
+    ("ATL", "CLT"): {"h": 4, "m": 15},
+    ("TRI", "ATL"): {"h": 4, "m": 45},
+    ("LEX", "IND"): {"h": 3, "m": 0},
+    ("HTS", "CLT"): {"h": 4, "m": 30},
+    ("SHD", "CLT"): {"h": 4, "m": 45},
+}
+
+# ── Logic ─────────────────────────────────────────────────────────────────────
+
+def get_route(dep, arr):
+    if (dep, arr) in ROUTES:
+        return ROUTES[(dep, arr)]
+    if (arr, dep) in ROUTES:
+        return ROUTES[(arr, dep)]
+    return None
+
+def get_route_days(dep, arr):
+    if (dep, arr) in ROUTE_DAYS:
+        return ROUTE_DAYS[(dep, arr)]
+    if (arr, dep) in ROUTE_DAYS:
+        return ROUTE_DAYS[(arr, dep)]
+    return None
+
+def route_operates_on_date(dep, arr, d):
+    operating_days = get_route_days(dep, arr)
+    if operating_days is None:
+        return False
+    return d.weekday() in operating_days
+
+def operating_days_text(dep, arr):
+    days = get_route_days(dep, arr)
+
+    if days is None:
+        return None
+
+    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    return ", ".join(day_names[d] for d in days)
+
+def find_connection(dep, arr, d):
+    valid_connections = []
+    for mid, city in AIRPORTS:
+        if mid == dep or mid == arr:
+            continue
+        first_route = get_route(dep, mid)
+        second_route = get_route(mid, arr)
+        if not first_route or not second_route:
+            continue
+        if not route_operates_on_date(dep, mid, d):
+            continue
+        if not route_operates_on_date(mid, arr, d):
+            continue
+        layover_minutes = 45
+        total_minutes = (
+            first_route["dur_h"] * 60 + first_route["dur_m"] +
+            layover_minutes +
+            second_route["dur_h"] * 60 + second_route["dur_m"]
+        )
+        valid_connections.append({
+            "mid": mid,
+            "first_route": first_route,
+            "second_route": second_route,
+            "total_minutes": total_minutes,
+        })
+    if not valid_connections:
+        return None
+    best = min(valid_connections, key=lambda x: x["total_minutes"])
+    return best["mid"], best["first_route"], best["second_route"]
+
+def add_minutes(hour, minute, duration_h, duration_m):
+    total_minutes = hour * 60 + minute + duration_h * 60 + duration_m
+    return (total_minutes // 60) % 24, total_minutes % 60
+
+def flight_price(h, m, booking_mode="seat"):
+    fh = h + m / 60
+    cost_fh = 1209
+    fluff = 200
+    cost_seat_hour = (cost_fh + fluff) / 19
+    desired_profit = 40
+    rate_seat_whole = fh * cost_seat_hour + desired_profit
+    rate_ac_whole = (cost_fh + fluff) * fh + desired_profit
+    rate_seat = math.ceil(rate_seat_whole / 10) * 10 - 1
+    rate_ac = math.ceil(rate_ac_whole / 10) * 10 - 1
+    if booking_mode == "charter":
+        rate_ac += 500
+        return rate_ac
+    return rate_seat
+
+def generate_flights(dep, arr, d, count=5):
+    route = get_route(dep, arr)
+    if route is None:
+        return []
+    if not route_operates_on_date(dep, arr, d):
+        return []
+    departure_times = [(9,0),(11,0),(13,0),(15,0),(17,0)]
+    flights = []
+    for i, (dep_h, dep_m) in enumerate(departure_times[:count]):
+        arr_h, arr_m = add_minutes(dep_h, dep_m, route["dur_h"], route["dur_m"])
+        seat_price = flight_price(route["dur_h"], route["dur_m"], "seat")
+        aircraft_price = flight_price(route["dur_h"], route["dur_m"], "charter")
+        if i == 0:
+            seat_price += 20
+        elif i == 2:
+            seat_price -= 10
+        flights.append({
+            "dep_h": dep_h, "dep_m": dep_m, "arr_h": arr_h, "arr_m": arr_m,
+            "dur_h": route["dur_h"], "dur_m": route["dur_m"],
+            "stops": "Nonstop", "aircraft": "E.C.H.O.",
+            "price": seat_price, "aircraft_price": aircraft_price,
+            "seats_left": 2 if i == 0 else None,
+            "popular": True if i == 1 else False,
+            "dep_code": dep, "arr_code": arr,
+            "dep_city": AIRPORT_CODES.get(dep, dep),
+            "arr_city": AIRPORT_CODES.get(arr, arr),
+        })
+    return flights
+
+def generate_multileg_flights(dep, arr, d, count=5):
+    direct = generate_flights(dep, arr, d, count)
+    if direct:
+        return direct, "direct"
+    connection = find_connection(dep, arr, d)
+    if connection is None:
+        return [], "none"
+    mid, first_route, second_route = connection
+    departure_times = [(8,0),(11,0),(14,0)]
+    itineraries = []
+    for i, (dep_h, dep_m) in enumerate(departure_times[:count]):
+        mid_arr_h, mid_arr_m = add_minutes(dep_h, dep_m, first_route["dur_h"], first_route["dur_m"])
+        second_dep_h, second_dep_m = add_minutes(mid_arr_h, mid_arr_m, 0, 45)
+        final_arr_h, final_arr_m = add_minutes(second_dep_h, second_dep_m, second_route["dur_h"], second_route["dur_m"])
+        price1 = flight_price(first_route["dur_h"], first_route["dur_m"], "seat")
+        aircraft_price1 = flight_price(first_route["dur_h"], first_route["dur_m"], "charter")
+        price2 = flight_price(second_route["dur_h"], second_route["dur_m"], "seat")
+        aircraft_price2 = flight_price(second_route["dur_h"], second_route["dur_m"], "charter")
+        itineraries.append({
+            "multi_leg": True, "connection": mid,
+            "leg1": {
+                "dep_h": dep_h, "dep_m": dep_m, "arr_h": mid_arr_h, "arr_m": mid_arr_m,
+                "dur_h": first_route["dur_h"], "dur_m": first_route["dur_m"],
+                "stops": "Nonstop", "aircraft": "E.C.H.O.",
+                "price": price1, "aircraft_price": aircraft_price1,
+                "seats_left": 2 if i == 0 else None, "popular": True if i == 1 else False,
+                "dep_code": dep, "arr_code": mid,
+                "dep_city": AIRPORT_CODES.get(dep, dep), "arr_city": AIRPORT_CODES.get(mid, mid),
+            },
+            "leg2": {
+                "dep_h": second_dep_h, "dep_m": second_dep_m, "arr_h": final_arr_h, "arr_m": final_arr_m,
+                "dur_h": second_route["dur_h"], "dur_m": second_route["dur_m"],
+                "stops": "Nonstop", "aircraft": "E.C.H.O.",
+                "price": price2, "aircraft_price": aircraft_price2,
+                "seats_left": 2 if i == 0 else None, "popular": True if i == 1 else False,
+                "dep_code": mid, "arr_code": arr,
+                "dep_city": AIRPORT_CODES.get(mid, mid), "arr_city": AIRPORT_CODES.get(arr, arr),
+            },
+            "price": price1 + price2,
+        })
+    return itineraries, "connection"
+
+def random_flights(dep, arr, d, count=5):
+    flights, _ = generate_multileg_flights(dep, arr, d, count)
+    return flights
+
+def fmt_time(h, m):
+    ampm = "AM" if h < 12 else "PM"
+    return f"{h % 12 or 12}:{m:02d}", ampm
+
+def get_drive_time(dep, arr):
+    if (dep, arr) in DRIVE_TIMES:
+        return DRIVE_TIMES[(dep, arr)]
+    if (arr, dep) in DRIVE_TIMES:
+        return DRIVE_TIMES[(arr, dep)]
+    return None
+
+def time_to_minutes(t):
+    return t["h"] * 60 + t["m"]
+
+def minutes_to_str(minutes):
+    h = minutes // 60
+    m = minutes % 60
+    if h == 0:
+        return f"{m} min"
+    if m == 0:
+        return f"{h}h"
+    return f"{h}h {m}m"
+
+def flight_duration_minutes(f):
+    if f.get("multi_leg"):
+        return (f["leg1"]["dur_h"]*60 + f["leg1"]["dur_m"] + 45 +
+                f["leg2"]["dur_h"]*60 + f["leg2"]["dur_m"])
+    return f["dur_h"]*60 + f["dur_m"]
+
+def route_drive_minutes(f):
+    if f.get("multi_leg"):
+        leg1_drive = get_drive_time(f["leg1"]["dep_code"], f["leg1"]["arr_code"])
+        leg2_drive = get_drive_time(f["leg2"]["dep_code"], f["leg2"]["arr_code"])
+        if not leg1_drive or not leg2_drive:
+            return None
+        return time_to_minutes(leg1_drive) + time_to_minutes(leg2_drive)
+    drive = get_drive_time(f.get("dep_code",""), f.get("arr_code",""))
+    return time_to_minutes(drive) if drive else None
+
+def apply_booking_mode(flights, booking_mode):
+    processed = []
+    for f in flights:
+        f_copy = copy.deepcopy(f)
+        if f_copy.get("multi_leg"):
+            if booking_mode == "charter":
+                f_copy["display_price"] = (f_copy["leg1"]["aircraft_price"] +
+                                           f_copy["leg2"]["aircraft_price"])
+            else:
+                f_copy["display_price"] = f_copy["price"]
+        else:
+            if booking_mode == "charter":
+                f_copy["display_price"] = f_copy["aircraft_price"]
+            else:
+                f_copy["display_price"] = f_copy["price"]
+        processed.append(f_copy)
+    return processed
 
 # ── UI Helpers ────────────────────────────────────────────────────────────────
 
@@ -258,7 +510,7 @@ def render_flight_card(f, key, booking_mode, passengers, context="outbound"):
       <div class="flight-card-body">
         <div class="flight-times">
           <span class="time-big">{dep_t}</span><span class="time-ampm">{dep_ap}</span>
-          <span class="flight-arrow">&nbsp;─✈─&nbsp;</span>
+          <span class="flight-arrow">&nbsp;──✈──&nbsp;</span>
           <span class="time-big">{arr_t}</span><span class="time-ampm">{arr_ap}</span>
         </div>
         <div class="flight-mid">
@@ -356,7 +608,7 @@ def render_multileg_card(itin, key, booking_mode, passengers):
       <div class="flight-card-body">
         <div class="flight-times">
           <span class="time-big">{dep_t}</span><span class="time-ampm">{dep_ap}</span>
-          <span class="flight-arrow">&nbsp;─✈─&nbsp;</span>
+          <span class="flight-arrow">&nbsp;──✈──&nbsp;</span>
           <span class="time-big">{arr_t}</span><span class="time-ampm">{arr_ap}</span>
         </div>
         <div class="flight-mid">
@@ -468,7 +720,7 @@ def render_round_trip_card(out_f, ret_f, key, booking_mode, passengers):
         <div class="flight-card-body">
           <div class="flight-times">
             <span class="time-big">{dep_t}</span><span class="time-ampm">{dep_ap}</span>
-            <span class="flight-arrow">&nbsp;─✈─&nbsp;</span>
+            <span class="flight-arrow">&nbsp;──✈──&nbsp;</span>
             <span class="time-big">{arr_t}</span><span class="time-ampm">{arr_ap}</span>
           </div>
           <div class="flight-mid">
@@ -519,7 +771,7 @@ def render_round_trip_card(out_f, ret_f, key, booking_mode, passengers):
       {ret_ta_html}
       <div class="rt-price-row">
         <div>
-          <span class="rt-price-text">Round Total: ${total_price}</span>
+          <span class="rt-price-text">Round Trip Total: ${total_price}</span>
           &nbsp;&nbsp;{savings_html}
         </div>
       </div>
@@ -538,7 +790,7 @@ def render_round_trip_card(out_f, ret_f, key, booking_mode, passengers):
             passenger_line = f"Passengers: {passengers}"
             final_total = total_price * passengers
 
-        st.success("Round Selected ✔")
+        st.success("Round Trip Selected ✔")
 
         st.markdown(f"""
         <div style="
@@ -568,7 +820,7 @@ def render_flight_days_table():
     </div>""", unsafe_allow_html=True)
 
     days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    header = '<div class="fdays-scroll"><table class="fdays-table"><thead><tr><th>Route</th>'
+    header = '<table class="fdays-table"><thead><tr><th>Route</th>'
     for d in days:
         header += f'<th>{d}</th>'
     header += '</tr></thead><tbody>'
@@ -583,14 +835,14 @@ def render_flight_days_table():
             rows += f'<td><div class="{cls}"></div></td>'
         rows += '</tr>'
 
-    st.markdown(header + rows + '</tbody></table></div>', unsafe_allow_html=True)
+    st.markdown(header + rows + '</tbody></table>', unsafe_allow_html=True)
 
 # ── Session State ─────────────────────────────────────────────────────────────
 
 def init_state():
     defaults = {
-        "trip_type": "Round",
-        "booking_mode": "Seats",
+        "trip_type": "Round Trip",
+        "booking_mode": "Seat Booking",
         "depart_code": "CRW",
         "arrive_code": "ATL",
         "passengers": 1,
@@ -620,59 +872,13 @@ st.markdown("""
 if "show_demo_notice" not in st.session_state:
     st.session_state.show_demo_notice = True
 
-# Replaced st.warning + orange "Close notice" button with a clean custom card
-# that has a small orange ✕ button flush in the top-right corner of the box
 if st.session_state.show_demo_notice:
-    st.markdown("""
-    <style>
-      .demo-notice-box {
-        position: relative;
-        background: #FFFBEA;
-        border: 1px solid #E5C97A;
-        border-left: 4px solid #E5751F;
-        border-radius: 4px;
-        padding: 12px 44px 12px 14px;
-        margin-bottom: 14px;
-        font-size: 0.82rem;
-        color: #1A1A2E;
-        line-height: 1.5;
-      }
-      .demo-notice-title {
-        font-weight: 800;
-        font-size: 0.85rem;
-        margin-bottom: 4px;
-        color: #1A1A2E;
-      }
-      /* Style the Streamlit close button as a small ✕ in the top-right */
-      div[data-testid="stButton"].close-x-btn > button {
-        position: absolute !important;
-        top: 6px !important;
-        right: 8px !important;
-        background: transparent !important;
-        color: #E5751F !important;
-        border: none !important;
-        font-size: 1.1rem !important;
-        font-weight: 900 !important;
-        min-height: 24px !important;
-        height: 24px !important;
-        width: 24px !important;
-        padding: 0 !important;
-        line-height: 1 !important;
-        box-shadow: none !important;
-      }
-      div[data-testid="stButton"].close-x-btn > button:hover {
-        background: transparent !important;
-        color: #861F41 !important;
-      }
-    </style>
-    <div class="demo-notice-box">
-      <div class="demo-notice-title">⚠️ Demo Project Notice</div>
-      This is a student design/demo application. ElectRAM Air is not a real airline or booking service.
-      No flights are actually being booked or operated.
-    </div>
-    """, unsafe_allow_html=True)
+    st.warning(
+        "⚠️ **Demo Project Notice**\n\n"
+        "This is a student design/demo application. ElectRAM Air is not a real airline or booking service. "
+        "No flights are actually being booked or operated."
+    )
 
-    # Reverted close button back to labeled "Close notice" text button per user request
     if st.button("Close notice", key="close_notice"):
         st.session_state.show_demo_notice = False
         st.rerun()
@@ -696,56 +902,49 @@ def swap_airports():
 with st.container():
     st.markdown('<div class="search-card-marker"></div>', unsafe_allow_html=True)
 
-    # Row 1a: Trip type + Passengers side by side
-    r1a_cols = st.columns([2.0, 1.25])
+    # Row 1: Trip type, passengers, booking mode, flight days button
+    r1_cols = st.columns([2.1, 1.8, 2.4, 1.9])
 
-    with r1a_cols[0]:
-        # Removed st.caption("Trip Type") - was duplicating the radio widget's own label
-        # Using label_visibility="visible" so the label renders once via Streamlit natively
+    with r1_cols[0]:
+        st.caption("Trip Type")
         trip_type = st.radio(
-            "Trip Type",
-            ["Round", "One Way"],
-            index=0 if st.session_state.trip_type == "Round" else 1,
+            "trip_type_radio",
+            ["Round Trip", "One Way"],
+            index=0 if st.session_state.trip_type == "Round Trip" else 1,
             horizontal=True,
-            label_visibility="visible",
+            label_visibility="collapsed",
         )
         st.session_state.trip_type = trip_type
 
-    with r1a_cols[1]:
+    with r1_cols[1]:
         st.caption("👤 Passengers")
-        p_col1, p_col2, p_col3 = st.columns([0.85, 0.4, 0.85])
+        p_col1, p_col2, p_col3 = st.columns([1.1, 0.8, 1.1])
         with p_col1:
             if st.button("−", key="pax_minus", use_container_width=True):
                 st.session_state.passengers = max(1, st.session_state.passengers - 1)
         with p_col2:
-            # Using .pax-num-wrap class so CSS can strip Streamlit's markdown wrapper padding
-            # that was causing the number to sit too low relative to the − and + buttons
             st.markdown(
-                f'<div class="pax-num-wrap"><span style="font-size:1.1rem;font-weight:bold">{st.session_state.passengers}</span></div>',
+                f"<div style='text-align:center;font-size:1.2rem;font-weight:bold;padding-top:10px'>{st.session_state.passengers}</div>",
                 unsafe_allow_html=True
             )
         with p_col3:
             if st.button("＋", key="pax_plus", use_container_width=True):
                 st.session_state.passengers = min(9, st.session_state.passengers + 1)
 
-    # Row 1b: Booking type + Flight Days button
-    r1b_cols = st.columns([2.0, 1.25])
-
-    with r1b_cols[0]:
-        # Removed st.caption("Booking Type") - was duplicating the radio widget's own label
-        # Using label_visibility="visible" so the label renders once via Streamlit natively
+    with r1_cols[2]:
+        st.caption("Booking Type")
         booking_mode = st.radio(
-            "Booking Type",
-            ["Seats", "Charter"],
-            index=0 if st.session_state.booking_mode == "Seats" else 1,
+            "booking_mode_radio",
+            ["Seat Booking", "Charter Aircraft"],
+            index=0 if st.session_state.booking_mode == "Seat Booking" else 1,
             horizontal=True,
-            label_visibility="visible",
+            label_visibility="collapsed",
         )
         st.session_state.booking_mode = booking_mode
 
-    with r1b_cols[1]:
-        st.markdown("<div style='height:26px'></div>", unsafe_allow_html=True)
-        if st.button("Flight Days", use_container_width=True):
+    with r1_cols[3]:
+        st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+        if st.button("📅 View Flight Days", use_container_width=True):
             st.session_state.show_flight_days = not st.session_state.show_flight_days
             st.rerun()
 
@@ -756,7 +955,7 @@ with st.container():
     def code_to_index(code):
         return airport_codes_list.index(code) if code in airport_codes_list else 0
 
-    r2_cols = st.columns([2.7, 0.45, 2.7])
+    r2_cols = st.columns([2.1, 0.45, 2.1, 0.75, 2.0, 2.0])
 
     with r2_cols[0]:
         st.caption("Departing")
@@ -766,7 +965,7 @@ with st.container():
             label_visibility="collapsed",
             key="dep_select",
             on_change=update_depart_code
-        )
+        )       
 
     with r2_cols[1]:
         st.caption("&nbsp;")
@@ -787,10 +986,10 @@ with st.container():
             on_change=update_arrive_code
         )
 
-    is_round = st.session_state.trip_type == "Round"
-    date_cols = st.columns(2)
+    with r2_cols[3]:
+        st.write("")  # spacer
 
-    with date_cols[0]:
+    with r2_cols[4]:
         st.caption("Departure Date")
         depart_date = st.date_input(
             "depart_date_input",
@@ -801,7 +1000,8 @@ with st.container():
         )
         st.session_state.depart_date = depart_date
 
-    with date_cols[1]:
+    with r2_cols[5]:
+        is_round = st.session_state.trip_type == "Round Trip"
         st.caption("Return Date" if is_round else "Return Date (N/A)")
         return_date = st.date_input(
             "return_date_input",
@@ -815,7 +1015,9 @@ with st.container():
             st.session_state.return_date = return_date
 
     st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
-    find_clicked = st.button("✈  FIND FLIGHTS", use_container_width=True, key="find_flights_btn")
+    btn_col, _ = st.columns([1, 4])
+    with btn_col:
+        find_clicked = st.button("✈  FIND FLIGHTS", use_container_width=True, key="find_flights_btn")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -846,9 +1048,9 @@ if st.session_state.results and st.session_state.search_dep:
     arr = st.session_state.search_arr
     dep_city = AIRPORT_CODES.get(dep, dep)
     arr_city = AIRPORT_CODES.get(arr, arr)
-    booking_mode_key = "seat" if st.session_state.booking_mode == "Seats" else "charter"
+    booking_mode_key = "seat" if st.session_state.booking_mode == "Seat Booking" else "charter"
     passengers = st.session_state.passengers
-    is_round = st.session_state.trip_type == "Round"
+    is_round = st.session_state.trip_type == "Round Trip"
     dep_dt = datetime.combine(st.session_state.depart_date, datetime.min.time())
     ret_dt = datetime.combine(st.session_state.return_date, datetime.min.time())
     def fmt_display_date(d):
@@ -868,16 +1070,16 @@ if st.session_state.results and st.session_state.search_dep:
         st.markdown(f"""
         <div class="results-header">
           <span class="results-title">{dep} &nbsp;✈&nbsp; {arr} &nbsp;✈&nbsp; {dep}</span>
-          <span class="results-sub">Round &nbsp;·&nbsp; {dep_str} – {ret_str} &nbsp;·&nbsp; {passengers} passenger{"s" if passengers>1 else ""}</span>
+          <span class="results-sub">Round Trip &nbsp;·&nbsp; {dep_str} – {ret_str} &nbsp;·&nbsp; {passengers} passenger{"s" if passengers>1 else ""}</span>
         </div>""", unsafe_allow_html=True)
 
-        st.markdown(f'<div class="section-header">Round &nbsp;·&nbsp; {dep} → {arr} &nbsp;·&nbsp; {dep_str} &nbsp;&nbsp;|&nbsp;&nbsp; {arr} → {dep} &nbsp;·&nbsp; {ret_str}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-header">ROUND TRIP &nbsp;·&nbsp; {dep} → {arr} &nbsp;·&nbsp; {dep_str} &nbsp;&nbsp;|&nbsp;&nbsp; {arr} → {dep} &nbsp;·&nbsp; {ret_str}</div>', unsafe_allow_html=True)
 
         if not outbound_flights or not return_flights:
             out_days = operating_days_text(dep, arr)
             ret_days = operating_days_text(arr, dep)
 
-            message = f"No Round flights are available for the selected dates.\n\n"
+            message = f"No round trip flights are available for the selected dates.\n\n"
 
             if not outbound_flights and out_days:
                 message += f"Outbound {dep} → {arr} operates on: **{out_days}**.\n\n"
