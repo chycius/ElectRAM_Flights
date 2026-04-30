@@ -544,7 +544,8 @@ if st.session_state.show_demo_notice:
     st.warning(
         "⚠️ **Demo Project Notice**\n\n"
         "This is a student design/demo application. ElectRAM Air is not a real airline or booking service. "
-        "No flights are actually being booked or operated."
+        "No flights are actually being booked or operated.\n"
+        "This has been modified to show off more routes, normal operations would have less flights."
     )
 
     if st.button("Close notice", key="close_notice"):

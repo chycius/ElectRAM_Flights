@@ -668,7 +668,8 @@ if st.session_state.show_demo_notice:
     <div class="demo-notice-box">
       <div class="demo-notice-title">⚠️ Demo Project Notice</div>
       This is a student design/demo application. ElectRAM Air is not a real airline or booking service.
-      No flights are actually being booked or operated.
+      No flights are actually being booked or operated. 
+      This has been modified to show off more routes, normal operations would have less flights.
     </div>
     """, unsafe_allow_html=True)
 
