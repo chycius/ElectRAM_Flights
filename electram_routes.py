@@ -1,11 +1,4 @@
-# electram_routes.py
-# Shared route, schedule, drive-time, and pricing logic for ElectRAM Air.
-#
-# Put this file in the same folder as:
-#   ElectRAM_Flights.py
-#   ElectRAM_Flights_Web.py
-#
-# Then import the shared values/functions into both apps.
+# Routes overhaul for more route frequency
 
 from datetime import datetime
 import copy

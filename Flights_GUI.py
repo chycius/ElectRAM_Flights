@@ -1,5 +1,3 @@
-# Mostly AI generated code lol
-
 import tkinter as tk
 from tkinter import messagebox
 from datetime import date, datetime, timedelta

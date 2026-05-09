@@ -1,3 +1,5 @@
+# Desktop UI with the initial route logic (pre-overhaul)
+
 import streamlit as st
 from datetime import date, datetime, timedelta
 import math
