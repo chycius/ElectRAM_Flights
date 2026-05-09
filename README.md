@@ -1,4 +1,4 @@
-Flight booking apps for ElectRAM Part 380 Charter company.
+Flight booking apps for ElectRAM Part 380 Charter company. AI (ChatGPT and Claude) were used to assist with creation of code.
 
 Desktop app: https://electram-flights-book-desktop.streamlit.app/
 
